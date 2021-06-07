@@ -1,0 +1,2 @@
+#!/bin/bash
+clang -O2 *.c -I../libft/inc -L../libft -lft -o program

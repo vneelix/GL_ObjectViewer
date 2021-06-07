@@ -1,0 +1,2 @@
+#!/bin/bash
+clang -O2 *.c glad/src/gl.c -Iglad/include -Ilibft/inc -Llibft -lft `pkg-config --cflags --libs --static glfw3` -o program
