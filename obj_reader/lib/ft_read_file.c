@@ -1,30 +1,33 @@
 #include "obj_reader.h"
 
-char*	ft_read_file(const char *path) {
-	int fd = open(path, O_RDONLY);
-	if (fd == -1) {
-		return NULL;
-	}
+char	*ft_read_file(const char *path)
+{
+	int			fd;
+	struct stat	st;
+	void		*data;
 
-	struct stat st;
+	fd = open(path, O_RDONLY);
+	if (fd == -1)
+		return (NULL);
 	fstat(fd, &st);
-	long size = st.st_size;
-	if (size == -1) {
+	if (st.st_size == -1)
+	{
 		close(fd);
-		return NULL;
+		return (NULL);
 	}
-
-	void *data = malloc(sizeof(char) * (size + 1));
-	if (!data) {
+	data = malloc(sizeof(char) * (st.st_size + 1));
+	if (data == NULL)
+	{
 		close(fd);
-		return NULL;
+		return (NULL);
 	}
-	ft_bzero(data, size + 1);
-	if (read(fd, data, size) == -1) {
+	((char *)data)[st.st_size] = 0;
+	if (read(fd, data, st.st_size) == -1)
+	{
 		close(fd);
 		free(data);
-		return NULL;
+		return (NULL);
 	}
 	close(fd);
-	return data;
+	return (data);
 }

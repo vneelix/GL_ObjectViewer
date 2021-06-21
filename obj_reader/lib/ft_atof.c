@@ -6,12 +6,17 @@
 /*   By: vneelix <vneelix@student.21-school.ru>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/17 15:21:08 by vneelix           #+#    #+#             */
-/*   Updated: 2021/05/17 15:35:27 by vneelix          ###   ########.fr       */
+/*   Updated: 2021/06/22 00:14:35 by vneelix          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
+/**
+ * Convert a string to a double
+ * @param str pointer to string
+ * @return converted value
+*/
 double	ft_atof(const char *str)
 {
 	int		d;

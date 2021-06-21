@@ -6,7 +6,7 @@
 /*   By: vneelix <vneelix@student.21-school.ru>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/16 14:40:07 by vneelix           #+#    #+#             */
-/*   Updated: 2021/05/16 20:44:26 by vneelix          ###   ########.fr       */
+/*   Updated: 2021/06/21 23:50:30 by vneelix          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,7 @@ static void	fill_memory(const char *str, const char sep,
  * @param sep separator for string
  * @return Array of strings.
  * Attention returned strings are contained in a single section of memory,
- * so to clear it is enough to free only the pointer
+ * so to clear it is enough to free only the returned pointer
  */
 char	**ft_strsplit(const char *str, const char sep)
 {
