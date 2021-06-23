@@ -1,119 +1,167 @@
 #include "obj_reader.h"
 
-typedef enum type {
-	v,
-	vn,
-	vt,
-	f
-} t_type;
+char	**get_splitted_obj(const char *path) {
+	char	**obj;
+	char	*file;
 
-float *vertice;
-float *normal;
-float *surface;
-int type_size[] = {0, 0, 0, 0};
-
-void*	get_obj(const char *path) {
-	char *file = ft_read_file(path);
+	file = ft_read_file(path);
 	if (!file)
-		return NULL;
-
-	char **data = ft_strsplit((const char*)file, '\n');
+		return (NULL);
+	obj = ft_strsplit(file, '\n');
 	free(file);
-	if (!data)
-		return NULL;
+	return (obj);
+}
 
-	int count_f = 0;
+int	def_count(const char **obj, unsigned long *def, unsigned long *mem_size) {
+	int count;
 
-	for (int i = 0; data[i]; i++) {
-		if (memcmp(data[i], "vn", 2) == 0)
-			type_size[vn]++;
-		else if (memcmp(data[i], "vt", 2) == 0)
-			type_size[vt]++;
-		else if (data[i][0] == 'v')
-			type_size[v]++;
-
-		int c;
-		if (data[i][0] == 'f') {
-			count_f++;
-			type_size[f] += sizeof(void*);
-			c = is_definition_complex(data[i], 1);
-			if (c < 0)
-				return NULL;
-			type_size[f] += sizeof(int) + c * 3 * sizeof(int);
+	count = 0;
+	*mem_size = 6 * sizeof(void*);
+	bzero(def, sizeof(unsigned long) * 4);
+	while (*obj) {
+		if (!strncmp(*obj, "v ", 2) || !strncmp(*obj, "v\t", 2)) {
+			def[v]++;
+			count = is_definition(*obj, 1);
+			if (!(count == 3 || count == 4))
+				return (-1);
 		}
+		else if (!strncmp(*obj, "vn ", 3) || !strncmp(*obj, "vn\t", 3)) {
+			def[vn]++;
+			count = is_definition(*obj, 2);
+			if (!(count == 3 || count == 4))
+				return (-1);
+		}
+		else if (!strncmp(*obj, "vt ", 3) || !strncmp(*obj, "vt\t", 3)) {
+			def[vt]++;
+			count = is_definition(*obj, 2);
+			if (!(count == 2 || count == 3))
+				return (-1);
+		}
+		else if (!strncmp(*obj, "f ", 2) || !strncmp(*obj, "f\t", 2)) {
+			def[f]++;
+			count = is_definition_complex(*obj, 1);
+			if (count < 0)
+				return (-1);
+			*mem_size += sizeof(void*) + sizeof(int) + count * 3 * sizeof(int);
+		}
+		obj++;
+	}
+	*mem_size += 3 * sizeof(float) * (1 + def[vt] + sizeof(float) * (def[v] + def[vn]));
+	return (0);
+}
+
+int		simple_writer(const char *str, void *dest, unsigned int def) {
+	static void *writer[3] = {NULL, NULL, NULL};
+
+	if (!writer[def])
+		writer[def] = dest;
+	if (def == v)
+		write_definition(str, 1, writer[def]);
+	else
+		write_definition(str, 2, writer[def]);
+	writer[def] += sizeof(float) * 4;
+	return (0);
+}
+
+int 	complex_writer(const char *str, void *dest, unsigned long count) {
+	static void *writer_ptr = NULL;
+	static void *writer_data = NULL;
+
+	if (!writer_ptr)
+		writer_ptr = dest;
+	if (!writer_data)
+		writer_data = dest + sizeof(void*) * (count + 1);
+	*((void **)writer_ptr) = writer_data;
+	writer_ptr += sizeof(void*);
+	writer_data = write_definition_complex(str, 1, writer_data);
+	return 0;
+}
+
+int		def_writer(const char **obj, void *mem, unsigned long *def) {
+	while (*obj) {
+		if (!strncmp(*obj, "v ", 2) || !strncmp(*obj, "v\t", 2))
+			simple_writer(*obj, ((void **)mem)[v] + sizeof(float), v);
+		else if (!strncmp(*obj, "vn ", 3) || !strncmp(*obj, "vn\t", 3))
+			simple_writer(*obj, ((void **)mem)[vn] + sizeof(float), vn);
+		else if (!strncmp(*obj, "vt ", 3) || !strncmp(*obj, "vt\t", 3))
+			simple_writer(*obj, ((void **)mem)[vt] + sizeof(float), vt);
+		else if (!strncmp(*obj, "f ", 2) || !strncmp(*obj, "f\t", 2))
+			complex_writer(*obj, ((void **)mem)[f], def[f]);
+		obj++;
+	}
+	return (0);
+}
+
+void	*get_memory(const char **obj, unsigned long *def_cpy) {
+	void			*mem;
+	unsigned long	def[4];
+	unsigned long	mem_size;
+
+	def_count(obj, def, &mem_size);
+	mem = malloc(mem_size);
+	if (!mem)
+		return (NULL);
+	bzero(mem, mem_size);
+	((void **)mem)[0] = mem + 5 * sizeof(void*);
+	((void **)mem)[1] = ((void **)mem)[0] + sizeof(float) + 4 * sizeof(float) * def[v];
+	((void **)mem)[2] = ((void **)mem)[1] + sizeof(float) + 4 * sizeof(float) * def[vn];
+	((void **)mem)[3] = ((void **)mem)[2] + sizeof(float) + 3 * sizeof(float) * def[vt];
+	*((float*)((void **)mem)[0]) = def[v];
+	*((float*)((void **)mem)[1]) = def[vn];
+	*((float*)((void **)mem)[2]) = def[vt];
+	if (def_cpy)
+		memcpy(def_cpy, def, sizeof(unsigned long) * 4);
+	return (mem);
+}
+
+void	*read_obj(const char *path) {
+	void			*mem;
+	char			**obj;
+	unsigned long	def[4];
+
+	obj = get_splitted_obj(path);
+	mem = get_memory((const char **)obj, def);
+	def_writer((const char **)obj, mem, def);
+
+/* 	int count = 0;
+
+	float *vertices = ((void **)mem)[0];
+	count = *vertices;
+	vertices++;
+
+	for (int i = 0; i != count; i++) {
+		printf("v %f %f %f %f\n", vertices[0], vertices[1], vertices[2], vertices[3]);
+		vertices += 4;
 	}
 
-	float *p0 = vertice = malloc(sizeof(float) * type_size[v] * 4 + sizeof(float));
-	float *p1 = normal = malloc(sizeof(float) * type_size[vn] * 4 + sizeof(float));
-	*p0++ = type_size[v];
-	*p1++ = type_size[vn];
+	float *normals = ((void **)mem)[1];
+	count = *normals;
+	normals++;
 
-	bzero(p0, sizeof(float) * type_size[v] * 4);
-	bzero(p1, sizeof(float) * type_size[vn] * 4);
-
-	type_size[f] += sizeof(void*);
-	void *poly = malloc(type_size[f]);
-	bzero(poly, type_size[f]);
-
-	void *poly_writer = poly;
-	void *poly_data_writer = poly + (count_f + 1) * sizeof(void*);
-
-	for( int i = 0; data[i]; i++) {
-		int c = 0;
-		if (memcmp(data[i], "vn", 2) == 0) {
-			c = is_definition(data[i], 2);
-			if (c == 3) {
-				write_definition(data[i], 2, p1);
-				p1 += 4;
-			}
-		}
-		else if (data[i][0] == 'v') {
-			c = is_definition(data[i], 1);
-			if (c == 3 || c == 4) {
-				write_definition(data[i], 1, p0);
-				if (c == 3)
-					p0[3] = 1;
-				p0 += 4;
-			}
-		}
-		else if (data[i][0] == 'f') {
-			*((unsigned long*)poly_writer) = poly_data_writer;
-			poly_writer += sizeof(void*);
-			poly_data_writer = write_definition_complex(data[i], 1, poly_data_writer);
-		}
+	for (int i = 0; i != count; i++) {
+		printf("vn %f %f %f %f\n", normals[0], normals[1], normals[2], normals[3]);
+		normals += 4;
 	}
 
-	for (int i = 0; ((int**)poly)[i]; i++) {
-		int *ptr = &((int**)poly)[i][1];
-		for (int j = 0; j != ((int**)poly)[i][0]; j++) {
-			printf("%d/%d/%d ", ptr[0], ptr[1], ptr[2]);
-			ptr += 3;
+	int **f_ptr = ((void **)mem)[3];
+	for (; *f_ptr; f_ptr++) {
+		printf("f ");
+		count = **f_ptr;
+		int *arr = *f_ptr + 1;
+		for (int i = 0; i != count; i++) {
+			printf("%d/%d/%d ", arr[0], arr[1], arr[2]);
+			arr += 3;
 		}
 		printf("\n");
-	}
+	} */
 
-	free(data);
+	free(mem);
+	free(obj);
 
-	/* free(poly);
-	free(normal);
-	free(vertice); */
-
-	void *object_raw = malloc(sizeof(void*) * 4); /* vertices + normals + polygons (f) + NULLPTR = 4 */
-	bzero(object_raw, sizeof(void*) * 4);
-
-	*((void**)object_raw) = vertice;
-	*((void**)object_raw + sizeof(void*)) = normal;
-	*((void**)object_raw + 2 * sizeof(void*)) = poly;
-
-	return object_raw;
+	return (NULL);
 }
 
 int main(int argc, char *argv[]) {
-	void *object_raw = get_obj(argv[1]);
-
-	float	*vertices = *((void**)object_raw);
-	float	*normals = *((void**)object_raw + sizeof(void*));
-	int		**poly = *((void**)object_raw + 2 * sizeof(void*));
-
+	void *obj_raw = read_obj(argv[1]);
 	exit(0);
 }

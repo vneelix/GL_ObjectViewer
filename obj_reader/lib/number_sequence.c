@@ -6,9 +6,11 @@
 /*   By: vneelix <vneelix@student.21-school.ru>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/20 00:18:48 by vneelix           #+#    #+#             */
-/*   Updated: 2021/06/22 00:27:28 by vneelix          ###   ########.fr       */
+/*   Updated: 2021/06/24 01:40:30 by vneelix          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+#include "obj_reader.h"
 
 int	is_number_sequence(const char *str, unsigned char sp, unsigned long *bytes)
 {

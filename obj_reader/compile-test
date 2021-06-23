@@ -1,1 +1,0 @@
-clang -O2 test_perf.c -I../libft/inc -L../libft -lft -o program

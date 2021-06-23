@@ -6,9 +6,11 @@
 /*   By: vneelix <vneelix@student.21-school.ru>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/21 23:45:06 by vneelix           #+#    #+#             */
-/*   Updated: 2021/06/22 00:28:44 by vneelix          ###   ########.fr       */
+/*   Updated: 2021/06/24 01:40:51 by vneelix          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+#include "obj_reader.h"
 
 /* [char sequence] float_0 ... float_n-1 float_n */
 int	is_definition(const char *str, unsigned int offset)
@@ -40,7 +42,7 @@ int	write_definition(const char *str, unsigned int offset, float *dest)
 	{
 		while (*str == ' ' || *str == '\t')
 			str++;
-		*dest++ = ft_atof(str);
+		*dest++ = ft_atof(str);;
 		while (*str && *str != ' ' && *str != '\t')
 			str++;
 	}
@@ -89,7 +91,7 @@ void	*write_definition_complex(const char *str,
 		while (*str == ' ' || *str == '\t')
 			str++;
 		write_number_sequence(str, '/', &bytes, dest);
-		dest += sizeof(int) * 3;
+	dest += sizeof(int) * 3;
 		str += bytes;
 	}
 	return (dest);

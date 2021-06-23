@@ -12,6 +12,13 @@
 
 #include <sys/stat.h>
 
+typedef enum type {
+	v,
+	vn,
+	vt,
+	f
+} t_type;
+
 char*	ft_read_file(const char *path);
 double	ft_atof(const char *str);
 
