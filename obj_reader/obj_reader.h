@@ -30,16 +30,12 @@ int	write_number_sequence(const char *str, unsigned char sp,
 
 /* definitions section */
 
-/* [char sequence] float_0 ... float_n-1 float_n */
 int	is_definition(const char *str, unsigned int offset);
-/* [char sequence] float_0 ... float_n-1 float_n */
 int	write_definition(const char *str, unsigned int offset, float *dest);
-/* [char sequence] float_0/float_0/float_0
-... float_n-1/float_n-1/float_n-1 float_n/float_n/float_n */
 int	is_definition_complex(const char *str, unsigned int offset);
-/* [char sequence] float_0/float_0/float_0
-... float_n-1/float_n-1/float_n-1 float_n/float_n/float_n */
 void	*write_definition_complex(const char *str,
 									unsigned int offset, void *dest);
+
+void	*read_obj(const char *path);
 
 #endif

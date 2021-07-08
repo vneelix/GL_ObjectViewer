@@ -1,2 +1,2 @@
 #!/bin/bash
-clang -g *.c obj_reader/*.c glad/src/gl.c -Iglad/include -Ilibft/inc -Llibft -lft `pkg-config --cflags --libs --static glfw3` -o program
+clang -g *.c  glad/src/gl.c -Iglad/include -Iobj_reader/ -Ilibft/inc -Llibft -lft `pkg-config --cflags --libs --static glfw3` -o program

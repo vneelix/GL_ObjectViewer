@@ -1,0 +1,1 @@
+clang -g *.c ../vector/op*.c -lm -I. -I../vector -o program

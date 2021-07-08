@@ -122,8 +122,10 @@ void	*read_obj(const char *path) {
 	obj = get_splitted_obj(path);
 	mem = get_memory((const char **)obj, def);
 	def_writer((const char **)obj, mem, def);
+	free(obj);
+	return (mem);
 
-/* 	int count = 0;
+	/* int count = 0;
 
 	float *vertices = ((void **)mem)[0];
 	count = *vertices;
@@ -154,14 +156,14 @@ void	*read_obj(const char *path) {
 		}
 		printf("\n");
 	} */
-
-	free(mem);
-	free(obj);
-
-	return (NULL);
 }
 
 int main(int argc, char *argv[]) {
 	void *obj_raw = read_obj(argv[1]);
+
+	float *vertice = ((void **)obj_raw)[v];
+	int v_count = *vertice;
+
+	int **f_ptr = ((void **)obj_raw)[f];
 	exit(0);
 }
