@@ -6,7 +6,7 @@
 /*   By: vneelix <vneelix@student.21-school.ru>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/21 23:45:06 by vneelix           #+#    #+#             */
-/*   Updated: 2021/07/06 22:07:19 by vneelix          ###   ########.fr       */
+/*   Updated: 2021/07/13 17:36:42 by vneelix          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,7 @@ int	is_definition_complex(const char *str, unsigned int offset)
 		while (*str == ' ' || *str == '\t')
 			str++;
 		num = is_number_sequence(str, '/', &bytes);
-		if (!(num ==1 || num == 3))
+		if (!(num == 1 || num == 3))
 			return (-1);
 		str += bytes;
 		coord++;

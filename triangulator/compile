@@ -1,1 +1,2 @@
-clang -g *.c ../vector/op*.c -lm -I. -I../vector -o program
+#clang -g -Wall -Wextra *.c ../vector/*op*.c -lm -I. -I../vector -o program
+clang -g -Wall -Wextra -fsanitize=address *.c ../vector/*op*.c -lm -I. -I../vector -I../obj_reader ../obj_reader/*.c ../obj_reader/lib/*.c -I../libft/inc -L../obj_reader ../libft/src/*.c -o program

@@ -1,0 +1,7 @@
+{
+	"files.associations": {
+		"triangulator.h": "c",
+		"vector.h": "c",
+		"obj_reader.h": "c"
+	}
+}

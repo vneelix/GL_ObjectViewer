@@ -36,6 +36,10 @@ int	is_definition_complex(const char *str, unsigned int offset);
 void	*write_definition_complex(const char *str,
 									unsigned int offset, void *dest);
 
-void	*read_obj(const char *path);
+int	def_handler(const char *definition,
+		unsigned long *out_def, unsigned long *out_memory_size);
+int	def_writer(const char **obj, void *mem, unsigned long *def);
+
+void	*read_obj(const char *path, void *out_err_def);
 
 #endif
