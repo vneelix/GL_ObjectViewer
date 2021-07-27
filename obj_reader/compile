@@ -1,2 +1,0 @@
-#!/bin/bash
-clang -g -O0 -fsanitize=address *.c lib/*.c -I. -I../libft/inc ../libft/src/*.c -lm -o program

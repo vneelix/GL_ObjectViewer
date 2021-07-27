@@ -1,22 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   writer.c                                           :+:      :+:    :+:   */
+/*   wavefront_object_writer.c                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vneelix <vneelix@student.21-school.ru>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/15 23:17:15 by vneelix           #+#    #+#             */
-/*   Updated: 2021/07/15 23:17:35 by vneelix          ###   ########.fr       */
+/*   Updated: 2021/07/26 19:06:55 by vneelix          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "obj_reader.h"
+#include "wavefront_object_reader.h"
 
 static int	simple_writer(const char *str, void *dest, unsigned int def)
 {
 	static void	*writer[3] = {NULL, NULL, NULL};
 
-	if (!writer[def])
+	if (str == NULL && dest == NULL && def == 0)
+	{
+		bzero(writer, sizeof(void *) * 3);
+		return (0);
+	}
+	if (writer[def] == NULL)
 		writer[def] = dest;
 	if (def == v)
 	{
@@ -25,26 +30,35 @@ static int	simple_writer(const char *str, void *dest, unsigned int def)
 	}
 	else
 		write_definition(str, 2, writer[def]);
-	writer[def] += sizeof(float) * 4;
+	if (def != vt)
+		writer[def] += sizeof(float) * 4;
+	else
+		writer[def] += sizeof(float) * 3;
 	return (0);
 }
 
 static int	complex_writer(const char *str, void *dest, unsigned long count)
 {
-	static void	*writer_ptr = NULL;
+	static void	**writer_ptr = NULL;
 	static void	*writer_data = NULL;
 
-	if (!writer_ptr)
+	if (str == NULL && dest == NULL && count == 0)
+	{
+		writer_ptr = NULL;
+		writer_data = NULL;
+		return (0);
+	}
+	if (writer_ptr == NULL)
 		writer_ptr = dest;
-	if (!writer_data)
+	if (writer_data == NULL)
 		writer_data = dest + sizeof(void *) * (count + 1);
-	*((void **)writer_ptr) = writer_data;
-	writer_ptr += sizeof(void *);
+	*writer_ptr = writer_data;
+	writer_ptr++;
 	writer_data = write_definition_complex(str, 1, writer_data);
 	return (0);
 }
 
-int	def_writer(const char **obj, void *mem, unsigned long *def)
+int	def_writer(const char **obj, void *mem, unsigned int *def)
 {
 	while (*obj)
 	{

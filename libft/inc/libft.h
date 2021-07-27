@@ -6,7 +6,7 @@
 /*   By: vneelix <vneelix@student.21-school.ru>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/09/06 17:50:40 by vneelix           #+#    #+#             */
-/*   Updated: 2021/05/17 15:25:20 by vneelix          ###   ########.fr       */
+/*   Updated: 2021/07/26 18:58:55 by vneelix          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 # include <sys/types.h>
 # include <dirent.h>
 # include <math.h>
+# include <sys/stat.h>
 # define BUFF_SIZE 4096 * 16
 
 void			*ft_memset(void *s, int c, size_t n);
@@ -72,4 +73,8 @@ char			**ft_directory(char *name, size_t *num_files);
 int				ft_get_directory(char *directory,
 					void **dir, void **dir_file, size_t *count);
 int				ft_get_next_line(const int fd, char **line);
+
+char*	ft_read_file_fstat(const char *path);
+double	ft_atof(const char *str);
+int		is_number(const char *str);
 #endif

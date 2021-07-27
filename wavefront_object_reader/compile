@@ -1,0 +1,2 @@
+#!/bin/bash
+clang -g -O0 -fsanitize=address -Wall -Wextra main.c wavefront*.c wavefront_object_definition/*.c -I. -I../libft/inc ../libft/src/*.c -lm -o program

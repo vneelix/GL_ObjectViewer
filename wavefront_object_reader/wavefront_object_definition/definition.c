@@ -6,14 +6,13 @@
 /*   By: vneelix <vneelix@student.21-school.ru>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/21 23:45:06 by vneelix           #+#    #+#             */
-/*   Updated: 2021/07/13 17:36:42 by vneelix          ###   ########.fr       */
+/*   Updated: 2021/07/26 18:54:06 by vneelix          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "obj_reader.h"
+#include "wavefront_object_reader.h"
 
 /* [char sequence] float_0 ... float_n-1 float_n */
-
 int	is_definition(const char *str, unsigned int offset)
 {
 	int	coord;
@@ -43,7 +42,8 @@ int	write_definition(const char *str, unsigned int offset, float *dest)
 	{
 		while (*str == ' ' || *str == '\t')
 			str++;
-		*dest++ = ft_atof(str);
+		*dest = ft_atof(str);
+		dest++;
 		while (*str && *str != ' ' && *str != '\t')
 			str++;
 	}

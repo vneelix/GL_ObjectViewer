@@ -6,11 +6,11 @@
 /*   By: vneelix <vneelix@student.21-school.ru>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/20 00:18:48 by vneelix           #+#    #+#             */
-/*   Updated: 2021/06/24 01:40:30 by vneelix          ###   ########.fr       */
+/*   Updated: 2021/07/26 18:54:47 by vneelix          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "obj_reader.h"
+#include "wavefront_object_reader.h"
 
 int	is_number_sequence(const char *str, unsigned char sp, unsigned long *bytes)
 {

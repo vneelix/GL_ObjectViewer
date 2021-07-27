@@ -42,13 +42,31 @@
 				}
 			]
 		},
-		,
 		{
 			"name": "Reader",
 			"type": "cppdbg",
 			"request": "launch",
-			"program": "${workspaceFolder}/obj_reader/program",
+			"program": "${workspaceFolder}/wavefront_object_reader/program",
 			"args": ["/home/max/GL_ObjectViewer/resources/42.obj"],
+			"stopAtEntry": false,
+			"cwd": "${fileDirname}",
+			"environment": [],
+			"externalConsole": false,
+			"MIMode": "gdb",
+			"setupCommands": [
+				{
+					"description": "Включить автоматическое форматирование для gdb",
+					"text": "-enable-pretty-printing",
+					"ignoreFailures": true
+				}
+			]
+		},
+		{
+			"name": "Renderer",
+			"type": "cppdbg",
+			"request": "launch",
+			"program": "${workspaceFolder}/program",
+			"args": ["/home/max/GL_ObjectViewer/resources/42.obj", "0"],
 			"stopAtEntry": false,
 			"cwd": "${fileDirname}",
 			"environment": [],

@@ -6,7 +6,7 @@
 /*   By: vneelix <vneelix@student.21-school.ru>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/06 22:11:36 by vneelix           #+#    #+#             */
-/*   Updated: 2021/07/13 17:29:33 by vneelix          ###   ########.fr       */
+/*   Updated: 2021/07/26 22:39:21 by vneelix          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,9 +40,9 @@ int	is_valid_triangle(void **container, int index, int *indexes)
 	t_float2	vec0;
 	t_float2	vec1;
 
-	p[0] = get_elem_from_float2(container[2], (size_t)container[3], index);
-	p[1] = get_elem_from_float2(container[2], (size_t)container[3], index + 1);
-	p[2] = get_elem_from_float2(container[2], (size_t)container[3], index - 1);
+	p[0] = get_elem_from_float2(container[2], (size_t)container[3], index - 1);
+	p[1] = get_elem_from_float2(container[2], (size_t)container[3], index);
+	p[2] = get_elem_from_float2(container[2], (size_t)container[3], index + 1);
 	vec0 = p[2] - p[0];
 	vec1 = p[1] - p[0];
 	if (vec0.x * vec1.y - vec0.y * vec1.x <= 0)

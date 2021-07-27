@@ -38,4 +38,6 @@ int			inside_triangle(t_float2 p0, t_float2 p1, t_float2 p2, t_float2 a);
 
 int			triangulate_polygon(t_float2 *polygon,
 				size_t vertex_count, int *out_triangle);
+int			*triangulate_model(t_float4 *vertex, size_t vertex_count,
+							int **polygon, size_t polygon_count);
 #endif
