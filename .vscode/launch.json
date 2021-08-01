@@ -66,7 +66,7 @@
 			"type": "cppdbg",
 			"request": "launch",
 			"program": "${workspaceFolder}/program",
-			"args": ["/home/max/GL_ObjectViewer/resources/42.obj", "0"],
+			"args": ["/home/max/GL_ObjectViewer/resources/cottage.obj", "0"],
 			"stopAtEntry": false,
 			"cwd": "${fileDirname}",
 			"environment": [],

@@ -13,7 +13,7 @@ void main() {
 	vec4 lPosition = vec4(0, 0, 0, 1);
 	vec4 lVec = normalize(lPosition - fragmentShaderPosition);
 
-	vec4 n = outNormal;
+	vec4 n = normalize(outNormal);
 
 	vec4 pos = vec4(0, 0, 0, 1);
 

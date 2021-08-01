@@ -6,7 +6,7 @@
 /*   By: vneelix <vneelix@student.21-school.ru>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/15 23:18:43 by vneelix           #+#    #+#             */
-/*   Updated: 2021/07/26 18:59:50 by vneelix          ###   ########.fr       */
+/*   Updated: 2021/07/31 04:08:32 by vneelix          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ static int	def_handler2(const char *definition,
 	if (!strncmp(definition, "f ", 2) || !strncmp(definition, "f\t", 2))
 	{
 		ret = is_definition_complex(definition, 1);
-		if (ret < 0)
+		if (ret < 3)
 			return (-1);
 		out_def[f]++;
 		if (out_memory_size != NULL)

@@ -2,6 +2,7 @@
 	"files.associations": {
 		"triangulator.h": "c",
 		"vector.h": "c",
-		"obj_reader.h": "c"
+		"obj_reader.h": "c",
+		"wavefront_object_reader.h": "c"
 	}
 }

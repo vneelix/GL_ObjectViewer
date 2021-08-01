@@ -2,6 +2,9 @@
 #include "triangulator.h"
 #include "wavefront_object_reader.h"
 
+// #include <SDL2/SDL.h>
+// #include <SDL2/SDL_image.h>
+
 GLFWwindow *window = null;
 
 size_t	v_count;
@@ -35,7 +38,7 @@ int	VBO_init() {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO[2]);
-	glBufferData(GL_ARRAY_BUFFER, n_count * 2 * sizeof(t_float4), vbo_model, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, n_count * 2 * sizeof(t_float4) + sizeof(t_float2) * n_count, vbo_model, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	return 0;
@@ -159,6 +162,69 @@ t_float4 calc_triangle_normal(t_float4 p1, t_float4 p2, t_float4 p3) {
 	return n;
 }
 
+int print_obj(void **obj) {
+	float *v_def = ((float *)obj[v]) + 1;
+	int	v_def_count = ((float *)obj[v])[0];
+
+	if (v_def_count != 332922) {
+		printf("v_def_count != 332922\n");
+		exit(0);
+	}
+
+	for (int i = 0; i != v_def_count; i++) {
+		printf("v % f % f % f % f\n", v_def[0], v_def[1], v_def[2], v_def[3]);
+		v_def += 4;
+	}
+
+	float *vt_def = ((float *)obj[vt]) + 1;
+	int	vt_def_count = ((float *)obj[vt])[0];
+
+	if (vt_def_count != 233002) {
+		printf("vt_def_count != 233002\n");
+		exit(0);
+	}
+
+	for (int i = 0; i != vt_def_count; i++) {
+		printf("vt % f % f\n", vt_def[0], vt_def[1]);
+		vt_def += 2;
+	}
+
+	float *vn_def = ((float *)obj[vn]) + 1;
+	int	vn_def_count = ((float *)obj[vn])[0];
+
+	if (vn_def_count != 195844) {
+		printf("vn_def_count != 195844\n");
+		exit(0);
+	}
+
+	for (int i = 0; i != vn_def_count; i++) {
+		printf("vn % f % f % f % f\n", vn_def[0], vn_def[1], vn_def[2], vn_def[3]);
+		vn_def += 4;
+	}
+
+	int	**f_def = obj[f] + sizeof(int);
+	int f_def_count = *(int *)(obj[f]);
+
+	if (f_def_count != 192986) {
+		printf("f_def_count != 192986\n");
+		exit(0);
+	}
+
+	for (int i = 0; i != f_def_count; i++) {
+		int *polygon = f_def[i] + 1;
+		int polygon_vert_count = f_def[i][0];
+		printf("f ");
+		for (int j = 0; j != polygon_vert_count; j++) {
+			printf("%d/%d/%d", polygon[j * 3], polygon[j * 3 + 1], polygon[j * 3 + 2]);
+			if (j != polygon_vert_count - 1)
+				printf(" ");
+		}
+		printf("\n");
+	}
+
+	return (0);
+}
+
 int func(const char *path, int n) {
 	void	**data;
 
@@ -173,8 +239,30 @@ int func(const char *path, int n) {
 		exit(0);
 	}
 
+	float *vb = wavefront_to_gl_vbo_converter(data[v], data[vn], data[vt], data[f]);
+	if (vb == NULL)
+		exit(0);
+	vbo_model = vb + 1;
+	n_count = *vb;
+
+	/* float *normal_ptr = (void *)vb + sizeof(float) + sizeof(t_float4) * n_count + sizeof(t_float2) * n_count;
+	for (int i = 0; i != n_count; i++) {
+		printf("% f % f % f % f\n", normal_ptr[0], normal_ptr[1], normal_ptr[2], normal_ptr[3]);
+		normal_ptr += 4;
+	} */
+
+	return (0);
+
+	// SDL_Surface *sfe = IMG_Load("/home/max/GL_ObjectViewer/resources/rocks.jpg");
+	// char *img = sfe->pixels;
+
+	// glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, sfe->w, sfe->h, 0, GL_RGB, GL_UNSIGNED_BYTE, img);
+
 	size_t		vertex_count = *((float *)data[v]);
 	float		*vertex = (float *)(data[v] + sizeof(float));
+
+	size_t		textr_count = *((float *)data[vt]);
+	float		*textr = (float *)(data[vt] + sizeof(float));
 
 	/*  */
 	v_count = vertex_count;
@@ -187,17 +275,12 @@ int func(const char *path, int n) {
 	int		object_count = *(int*)object;
 	void	*mesh = ((void **)((void*)object + sizeof(int)))[n];
 
-	/* for (int i = 0; i != object_count; i++) {
-		printf("%d %s\n", i, ((void**)((void*)object + sizeof(int)))[i]);
-	} */
 
 	int		mesh_polygon_count = ((int *)(mesh + MAX_NAME_LEN))[f];
 	int		**mesh_polygon = polygon + ((int *)(mesh + MAX_NAME_LEN))[f + 4];
 
-	// int *triangles = triangulate_model(vertex, vertex_count, mesh_polygon, mesh_polygon_count);
-	int *triangles = triangulate_model(vertex, vertex_count, polygon, polygon_count);
+	int *triangles = NULL;
 
-	/*  */
 	i_count = *triangles;
 	index_buffer = triangles + 1;
 
@@ -207,6 +290,13 @@ int func(const char *path, int n) {
 
 	t_float4 *v_buffer = calloc(vertex_count, sizeof(t_float4));
 	memcpy(v_buffer, vertex_buffer, vertex_count * sizeof(t_float4));
+
+	int	*txtr_buffer = triangles + 1 + i_count * 3;
+	for (int i = 0; i != n_count; i++) {
+		t_float4 vert = get_elem_from_float4(v_buffer, vertex_count, index_buffer[i]);
+		t_float2 tex = *(const t_float2 *)get_elem_from_array(textr, textr_count, sizeof(float) * 3, txtr_buffer[i]);
+		printf("vertice[%-3d]: % f % f % f, textr[%-3d]: % f % f\n", index_buffer[i] + 1, vert.x, vert.y, vert.z, txtr_buffer[i] + 1, tex.x, tex.y);
+	}
 
 	vbo_model = calloc(n_count * 2, sizeof(t_float4));
 	t_float4 *ptr = vbo_model;
@@ -234,6 +324,9 @@ int func(const char *path, int n) {
 
 int	main(int argc, char *argv[]) {
 
+	// if (!IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG))
+		// exit(0);
+
 	/* Init glfw library */
 	if (glfw_init()) {
 		return -1;
@@ -253,7 +346,7 @@ int	main(int argc, char *argv[]) {
 
 	glEnable(GL_DEPTH_TEST);
 
-	func(argv[1], (int)ft_atof(argv[2]));
+	func(argv[1], argc == 3 ? (int)ft_atof(argv[2]) : 0);
 	VBO_init();
 	VAO_init();
 
@@ -269,7 +362,7 @@ int	main(int argc, char *argv[]) {
 	GLuint t_uni = glGetUniformLocation(program, "TranslationMatrix");
 
 	// projection_matrix(-1, 1, -1, 1, 2, 8, p_uni);
-	perspective_matrix(60 * pi / 180., 16. / 9., 2, 256, p_uni);
+	perspective_matrix(60 * pi / 180., 16. / 9., 0.128, 2048, p_uni);
 	rotation_matrix(0, 0, 0, 0, r_uni);
 	tranlsation_matrix(0, 0, 0, t_uni);
 	/*  */
@@ -331,9 +424,9 @@ int	main(int argc, char *argv[]) {
 
 		glBindBuffer(GL_ARRAY_BUFFER, VBO[2]);
 		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, (void *)0);
+		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, (GLvoid *)0);
 		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, (void *)(sizeof(t_float4) * n_count));
+		glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, (GLvoid *)(sizeof(t_float4) * n_count + sizeof(t_float2) * n_count));
 		glDrawArrays(GL_TRIANGLES, 0, n_count);
 		glDisableVertexAttribArray(1);
 		glDisableVertexAttribArray(0);

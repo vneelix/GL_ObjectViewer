@@ -12,8 +12,9 @@ out vec4 fragmentShaderPosition;
 out	vec4 outNormal;
 
 void main() {
+
 	outColor = vec4(1, 1, 1, 1);
-	outNormal = normalize(RotationMatrix * Normal);
+	outNormal = normalize(RotationMatrix * normalize(Normal));
 	fragmentShaderPosition = TranslationMatrix * RotationMatrix * Position;
 	gl_Position = ProjectionMatrix * fragmentShaderPosition;
 }
