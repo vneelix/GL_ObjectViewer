@@ -1,1 +1,1 @@
-clang -g -O0 -fsanitize=address -Wall -Wextra interface.c `pkg-config --cflags --static --libs SDL2 SDL2_image SDL2_ttf` -o program
+clang -g -O0 -fsanitize=address -Wall -Wextra *.c `pkg-config --cflags --static --libs SDL2 SDL2_image SDL2_ttf` -o program
