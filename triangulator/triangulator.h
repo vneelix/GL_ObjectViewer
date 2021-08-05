@@ -36,6 +36,5 @@ t_float4	get_elem_from_float4(const t_float4 *array,
 int			inside_triangle(t_float2 p0, t_float2 p1, t_float2 p2, t_float2 a);
 /*  */
 
-float		*wavefront_to_gl_vbo_converter(t_float4 *vertex,
-				t_float4 *normal, float *texture_coord, void *polygon);
+float		*wavefront_to_gl_vbo_converter(void **object_container, __uint32_t	*def_count);
 #endif

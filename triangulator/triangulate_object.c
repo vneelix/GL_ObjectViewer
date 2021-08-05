@@ -6,7 +6,7 @@
 /*   By: vneelix <vneelix@student.21-school.ru>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/27 15:16:25 by vneelix           #+#    #+#             */
-/*   Updated: 2021/07/31 05:40:10 by vneelix          ###   ########.fr       */
+/*   Updated: 2021/08/06 00:30:10 by vneelix          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,7 +120,7 @@ int	polygon_handling(t_float4 *vertex,
 	while (i != (size_t)polygon[0])
 	{
 		polygon3d[i] = get_elem_from_float4(
-				vertex, vertex_count, (polygon + 1)[i * 3] - 1);
+			vertex, vertex_count, (polygon + 1)[i * 3] - 1);
 		i++;
 	}
 	if (!triangulate_polygon3d(polygon3d, (size_t)polygon[0], writer[0]))
@@ -155,8 +155,6 @@ int	*wavefront_to_gl_index_converter(t_float4 *vertex,
 	init_writer(writer, index_array, tre_count);
 	while (i != polygon_count)
 	{
-		if (i == 1755)
-			i = 1755;
 		if (polygon_handling(vertex, vertex_count, polygon[i], writer) == -1)
 		{
 			free(index_array);
@@ -168,112 +166,95 @@ int	*wavefront_to_gl_index_converter(t_float4 *vertex,
 	return (index_array);
 }
 
-int	debug_index_array(t_float4 *vertex, t_float4 *normal, float *texture_coord, int *index_array, float *out_vbo);
-
-float	*wavefront_to_gl_vbo_converter(t_float4 *vertex,
-			t_float4 *normal, float *texture_coord, void *polygon)
+int	init_vbo_rw(void **vbo_writer, void **idx_reader, int *index_array, float *out_vbo)
 {
-	int	*index_array;
+	__uint32_t	v_count;
 
-	index_array = wavefront_to_gl_index_converter(
-		(float *)vertex + 1, ((float *)vertex)[0], (int *)polygon + 1, *(int *)polygon);
-
-	if (index_array == NULL)
-		return (NULL);
-
-	size_t vertex_count = *index_array * 3;
-	size_t size = sizeof(t_float4) * vertex_count * 2 + sizeof(t_float2) * vertex_count;
-
-
-	float *vbo = calloc(sizeof(float) + size, 1);
-	*vbo = vertex_count;
-
-	debug_index_array(vertex, normal, texture_coord, index_array, vbo + 1);
-	
-
-	return (vbo);
+	v_count = *index_array * 3;
+	vbo_writer[0] = out_vbo;
+	vbo_writer[1] = vbo_writer[0] + sizeof(t_float4) * v_count;
+	vbo_writer[2] = vbo_writer[1] + sizeof(t_float4) * v_count;
+	idx_reader[0] = index_array + 1;
+	idx_reader[1] = idx_reader[0] + sizeof(int) * v_count;
+	idx_reader[2] = idx_reader[1] + sizeof(int) * v_count;
+	return (0);
 }
 
-int	debug_index_array(t_float4 *vertex, t_float4 *normal, float *texture_coord, int *index_array, float *out_vbo) {
+int	write_float4(void *arr, size_t length, void *dest, int idx)
+{
+	const void	*src;
 
-	int n_count = *index_array * 3;
-	index_array++;
+	src = get_elem_from_array(arr, length, sizeof(t_float4), idx);
+	if (src != NULL)
+		memcpy(dest, src, sizeof(t_float4));
+}
 
-	int *vertex_index = index_array;
-	int *texture_index = index_array + n_count;
-	int *normal_index = index_array + n_count * 2;
+int	write_float2(void *arr, size_t length, void *dest, int idx)
+{
+	const void	*src;
 
-	float *vbo_vertex = out_vbo;
-	t_float2 *vbo_texture_coord = (void *)out_vbo + sizeof(t_float4) * n_count;
-	float *vbo_normal = (void *)out_vbo + sizeof(t_float4) * n_count + sizeof(t_float2) * n_count;
+	src = get_elem_from_array(arr, length, sizeof(t_float2), idx);
+	if (src != NULL)
+		memcpy(dest, src, sizeof(t_float2));
+}
 
-	for (int i = 0; i != n_count; i++) {
-		t_float4 v, n;
-		t_float2 t;
+int	write_vbo(void **object_container,
+	__uint32_t *def_count, int *index_array, float *out_vbo)
+{
+	__uint32_t	i;
+	void		*vbo_writer[3];
+	void		*idx_reader[3];
 
-		v = get_elem_from_float4((float*)vertex + 1, *(float*)vertex, vertex_index[i] - 1);
-		if (normal_index[i] != 0)
-			n = get_elem_from_float4((float*)normal + 1, *(float*)normal, normal_index[i] - 1);
-		else
-			n = (t_float4){0, 0, 0, 0};
-		if (texture_index[i] != 0) {
-			const t_float2 *ptr_t =
-				(const t_float2 *)get_elem_from_array(texture_coord + 1, *texture_coord, sizeof(float) * 3, texture_index[i] - 1);
-			if (ptr_t != NULL)
-				t = *ptr_t;
-			else
-				t = (t_float2){0, 0};
-		}
-		else
-			t = (t_float2){0, 0};
-
-		vbo_vertex[0] = v.x;
-		vbo_vertex[1] = v.y;
-		vbo_vertex[2] = v.z;
-		vbo_vertex[3] = v.w;
-
-		vbo_normal[0] = n.x;
-		vbo_normal[1] = n.y;
-		vbo_normal[2] = n.z;
-		vbo_normal[3] = n.w;
-
-		*vbo_texture_coord = t;
-		vbo_vertex += 4;
-		vbo_normal += 4;
-		vbo_texture_coord++;
-
-		/* printf("v[%3d] % f % f % f | ", vertex_index[i], v.x, v.y, v.z);
-		printf("vn[%3d] % f % f % f | ", normal_index[i], n.x, n.y, n.z);
-		printf("vt[%3d] % f % f\n", texture_index[i], t.x, t.y); */
+	i = 0;
+	init_vbo_rw(vbo_writer, idx_reader, index_array, out_vbo);
+	while (i != *index_array * 3)
+	{
+		if (def_count[0] != 0)
+			write_float4(object_container[0], def_count[0],
+				vbo_writer[0], ((int *)(idx_reader[0]))[i] - 1 - def_count[4]);
+		if (def_count[1] != 0)
+			write_float4(object_container[1], def_count[1],
+				vbo_writer[1], ((int *)(idx_reader[2]))[i] - 1 - def_count[5]);
+		if (def_count[2] != 0)
+			write_float2(object_container[2], def_count[2],
+				vbo_writer[2], ((int *)(idx_reader[1]))[i] - 1 - def_count[6]);
+		vbo_writer[0] += sizeof(t_float4);
+		vbo_writer[1] += sizeof(t_float4);
+		vbo_writer[2] += sizeof(t_float2);
+		i++;
 	}
 	return (0);
 }
 
-/* int	*triangulate_model(t_float4 *vertex, size_t vertex_count,
-							int **polygon, size_t polygon_count)
+float	*create_vbo(void **object_container, __uint32_t *def_count, int *index_array)
 {
-	size_t		i;
-	int			*p;
-	int			*triangle;
-	size_t		triangle_count;
+	float	*vbo;
 
-	i = 0;
-	triangle_count = model_triangles_count(polygon, polygon_count);
-	triangle = (int *)malloc(sizeof(int) + sizeof(int) * 3 * triangle_count);
-	if (!triangle)
+	vbo = calloc(sizeof(float) + sizeof(t_float4) * (*index_array * 3) * 2 + sizeof(t_float2) * (*index_array * 3), 1);
+	if (vbo == NULL)
 		return (NULL);
-	p = triangle + 1;
-	while (i != polygon_count)
-	{
-		if (extract_and_triangulate_polygon(
-				vertex, vertex_count, polygon[i], p, triangle_count) == -1)
-		{
-			free(triangle);
-			return (NULL);
-		}
-		p += (polygon[i][0] - 2) * 3;
-		i++;
-	}
-	*triangle = (int)triangle_count;
-	return (triangle);
-} */
+	*vbo = *index_array * 3;
+	write_vbo(object_container, def_count, index_array, vbo + 1);
+	return (vbo);
+}
+
+float	*wavefront_to_gl_vbo_converter(void **object_container, __uint32_t	*def_count)
+{
+
+	__uint32_t	vertex_count = def_count[0];
+	t_float4	*vertex = object_container[0];
+
+	__uint32_t	polygon_count = def_count[3];
+	void		**polygon = object_container[3];
+
+	int	*index_array;
+
+	index_array = wavefront_to_gl_index_converter(vertex, vertex_count, polygon, polygon_count);
+
+	if (index_array == NULL)
+		return (NULL);
+
+	float *vbo = create_vbo(object_container, def_count, index_array);	
+
+	return (vbo);
+}

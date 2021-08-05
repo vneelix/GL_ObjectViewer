@@ -239,7 +239,28 @@ int func(const char *path, int n) {
 		exit(0);
 	}
 
-	float *vb = wavefront_to_gl_vbo_converter(data[v], data[vn], data[vt], data[f]);
+	uint32_t obj_count = *(uint32_t *)object;
+
+	float *vb = NULL;
+
+	for (int i = 0; i != 1; i++) {
+		void *ptr = ((void **)((void *)object + sizeof(uint32_t)))[n];
+		uint32_t	*def_count = ptr + MAX_NAME_LEN;
+		uint32_t	*offset = def_count + 4;
+
+		t_float4 *ver = data[v] + sizeof(float);
+		t_float4 *nor = data[vn] + sizeof(float);
+		t_float2 *tex = data[vt] + sizeof(float);
+		int	*pol = data[f] + sizeof(int);
+
+		void		*container[5] = {
+			ver + offset[v], nor + offset[vn], tex + offset[vt], pol + offset[f],
+			NULL
+		};
+
+		vb = wavefront_to_gl_vbo_converter(container, def_count);
+	}
+
 	if (vb == NULL)
 		exit(0);
 	vbo_model = vb + 1;
@@ -426,7 +447,7 @@ int	main(int argc, char *argv[]) {
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, (GLvoid *)0);
 		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, (GLvoid *)(sizeof(t_float4) * n_count + sizeof(t_float2) * n_count));
+		glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, (GLvoid *)(sizeof(t_float4) * n_count/*  + sizeof(t_float2) * n_count */));
 		glDrawArrays(GL_TRIANGLES, 0, n_count);
 		glDisableVertexAttribArray(1);
 		glDisableVertexAttribArray(0);
