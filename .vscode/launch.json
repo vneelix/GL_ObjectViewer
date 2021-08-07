@@ -4,81 +4,18 @@
 	// For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
 	"version": "0.2.0",
 	"configurations": [
-		{
-			"name": "Triangulator",
-			"type": "cppdbg",
-			"request": "launch",
-			"program": "${workspaceFolder}/triangulator/program",
-			"args": [],
-			"stopAtEntry": false,
-			"cwd": "${fileDirname}",
-			"environment": [],
-			"externalConsole": false,
-			"MIMode": "gdb",
-			"setupCommands": [
-				{
-					"description": "Включить автоматическое форматирование для gdb",
-					"text": "-enable-pretty-printing",
-					"ignoreFailures": true
-				}
-			]
-		},
-		{
-			"name": "Vector",
-			"type": "cppdbg",
-			"request": "launch",
-			"program": "${workspaceFolder}/vector/program",
-			"args": [],
-			"stopAtEntry": false,
-			"cwd": "${fileDirname}",
-			"environment": [],
-			"externalConsole": false,
-			"MIMode": "gdb",
-			"setupCommands": [
-				{
-					"description": "Включить автоматическое форматирование для gdb",
-					"text": "-enable-pretty-printing",
-					"ignoreFailures": true
-				}
-			]
-		},
-		{
-			"name": "Reader",
-			"type": "cppdbg",
-			"request": "launch",
-			"program": "${workspaceFolder}/wavefront_object_reader/program",
-			"args": ["/home/max/GL_ObjectViewer/resources/42.obj"],
-			"stopAtEntry": false,
-			"cwd": "${fileDirname}",
-			"environment": [],
-			"externalConsole": false,
-			"MIMode": "gdb",
-			"setupCommands": [
-				{
-					"description": "Включить автоматическое форматирование для gdb",
-					"text": "-enable-pretty-printing",
-					"ignoreFailures": true
-				}
-			]
-		},
+
 		{
 			"name": "Renderer",
 			"type": "cppdbg",
 			"request": "launch",
 			"program": "${workspaceFolder}/program",
-			"args": ["/home/max/GL_ObjectViewer/resources/test_model.obj", "0"],
+			"args": ["/Users/vneelix/GL_ObjectViewer/resources/temp.obj"],
 			"stopAtEntry": false,
-			"cwd": "${fileDirname}",
+			"cwd": "${workspaceFolder}",
 			"environment": [],
 			"externalConsole": false,
-			"MIMode": "gdb",
-			"setupCommands": [
-				{
-					"description": "Включить автоматическое форматирование для gdb",
-					"text": "-enable-pretty-printing",
-					"ignoreFailures": true
-				}
-			]
+			"MIMode": "lldb"
 		}
 	]
 }

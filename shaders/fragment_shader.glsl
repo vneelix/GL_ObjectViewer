@@ -1,27 +1,34 @@
-#version 460 core
+#version 410 core
 
-in vec4 outColor;
-in vec4 fragmentShaderPosition;
-in vec4 outNormal;
+#define	AMBIENT 0.1
+#define LIGHT_INTENSE 0.64
 
-out vec4 FragColor;
+in	DATA {
+	/* object data */
+	vec4	position;
+	vec4	normal;
+	vec4	color;
 
-void main() {
+	/* area data */
+	vec4	camera;
+	vec4	light;
+}	input_data;
 
-	float d = 0.08;
+out vec4 fragColor;
 
-	vec4 lPosition = vec4(0, 0, 0, 1);
-	vec4 lVec = normalize(lPosition - fragmentShaderPosition);
+void main()
+{
+	vec4	toCameraVec = normalize(input_data.camera - input_data.position);
 
-	vec4 n = normalize(outNormal);
+	/* phong lighting */
+	vec4	normal = input_data.normal * sign(dot(input_data.normal, toCameraVec));
+	vec4	lightVec = normalize(input_data.light - input_data.position);
+	float	diffuseRatio = clamp(0., 1., dot(normal, lightVec)) * LIGHT_INTENSE + AMBIENT;
+	vec4	reflectLightVec = 2 * normal * dot(normal, lightVec) - lightVec;
+	float	specularRatio = pow(clamp(0., 1., dot(toCameraVec, reflectLightVec)), 64);
+	/*  */
 
-	vec4 pos = vec4(0, 0, 0, 1);
-
-	vec4 fromPoint = normalize(pos - fragmentShaderPosition);
-
-	n *= sign(dot(fromPoint, n));
-	d += clamp(0., 1., dot(lVec, n)) * 0.64;
-
-	FragColor = outColor * d;
-	FragColor.a = 1.;
+	vec4	objectColor = input_data.color * (1. - specularRatio) * diffuseRatio;
+	vec4	specularColor = vec4(1, 1, 1, 1) * specularRatio * LIGHT_INTENSE;
+    fragColor = clamp(vec4(0, 0, 0, 1), vec4(1, 1, 1, 1), objectColor + specularRatio);
 }

@@ -4,12 +4,9 @@
 #include "libft.h"
 
 #include <stdlib.h>
-#include <unistd.h>
 #include <string.h>
 #include <strings.h>
-
-#include <stdio.h>
-
+#include <unistd.h>
 #include <sys/stat.h>
 
 # define MAX_NAME_LEN	32

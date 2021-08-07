@@ -1,11 +1,12 @@
 #include "opengl_project.h"
 #include "triangulator.h"
 #include "wavefront_object_reader.h"
+#include <stdio.h>
 
 // #include <SDL2/SDL.h>
 // #include <SDL2/SDL_image.h>
 
-GLFWwindow *window = null;
+GLFWwindow *window = NULL;
 
 size_t	v_count;
 GLfloat *vertex_buffer;
@@ -22,6 +23,9 @@ GLuint VAO_id = 0;
 
 GLfloat	*vbo_model;
 
+GLuint	vao_id;
+GLuint	vbo_id;
+
 int	VBO_init() {
 	/* Get buffer object id's */
 	glGenBuffers(sizeof(VBO) / sizeof(GLuint), VBO);
@@ -33,9 +37,9 @@ int	VBO_init() {
 	/* Unbind vertex buffer */
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, VBO[1]);
+	/*glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, VBO[1]);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * i_count * 3, index_buffer, GL_STATIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);*/
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO[2]);
 	glBufferData(GL_ARRAY_BUFFER, n_count * 2 * sizeof(t_float4) + sizeof(t_float2) * n_count, vbo_model, GL_STATIC_DRAW);
@@ -46,33 +50,32 @@ int	VBO_init() {
 
 int VAO_init() {
 	/* Gen vertex array's list */
-	glGenVertexArrays(1, &VAO_id);
+	GLuint vao[1] = {0};
+	glGenVertexArrays(1, vao);
 
 	glBindVertexArray(VAO_id);
 
-	
-
 	/* Init coord buffer in VAO */
-	glEnableVertexArrayAttrib(VAO_id, 0);
+	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, null);
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	glEnableVertexArrayAttrib(VAO_id, 1);
+	glEnableVertexAttribArray(1);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO[2]);
-	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, null);
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, NULL);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	/* Init color buffer in VAO */
 	// glEnableVertexArrayAttrib(VAO_id, 1);
 	// glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
-	// glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, null);
+	// glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, NULL);
 	// glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	/* Init normal buffer in VAO */
 	// glEnableVertexArrayAttrib(VAO_id, 2);
 	// glBindBuffer(GL_ARRAY_BUFFER, VBO[3]);
-	// glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 0, null);
+	// glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 0, NULL);
 	// glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glBindVertexArray(0);
@@ -92,7 +95,7 @@ int glfw_init_window(const int weight, const int height, const char *title) {
 	window = glfwCreateWindow(
 		weight, height, title, NULL, NULL
 	);
-	if (window == null) {
+	if (window == NULL) {
 		char *message = "An error occurred during initialization window\n";
 		write(2, message, strlen(message));
 		return -1;
@@ -100,14 +103,14 @@ int glfw_init_window(const int weight, const int height, const char *title) {
 	return 0;
 }
 
-int glad_init() {
+/*int glad_init() {
 	if (gladLoadGL(glfwGetProcAddress) == 0) {
 		char *message = "An error occurred during load opengl functions\n";
 		write(2, message, strlen(message));
 		return -1;
 	}
 	return 0;
-}
+}*/
 
 GLuint create_program();
 
@@ -153,91 +156,27 @@ void tranlsation_matrix(double x, double y, double z, GLuint uni) {
 	glUniformMatrix4fv(uni, 1, GL_TRUE, matrix);
 }
 
-t_float4 calc_triangle_normal(t_float4 p1, t_float4 p2, t_float4 p3) {
-	t_float4 U, V;
-
-	U = p2 - p1;
-	V = p3 - p2;
-	t_float4 n = normalize(cross(U, V));
-	return n;
-}
-
-int print_obj(void **obj) {
-	float *v_def = ((float *)obj[v]) + 1;
-	int	v_def_count = ((float *)obj[v])[0];
-
-	if (v_def_count != 332922) {
-		printf("v_def_count != 332922\n");
-		exit(0);
-	}
-
-	for (int i = 0; i != v_def_count; i++) {
-		printf("v % f % f % f % f\n", v_def[0], v_def[1], v_def[2], v_def[3]);
-		v_def += 4;
-	}
-
-	float *vt_def = ((float *)obj[vt]) + 1;
-	int	vt_def_count = ((float *)obj[vt])[0];
-
-	if (vt_def_count != 233002) {
-		printf("vt_def_count != 233002\n");
-		exit(0);
-	}
-
-	for (int i = 0; i != vt_def_count; i++) {
-		printf("vt % f % f\n", vt_def[0], vt_def[1]);
-		vt_def += 2;
-	}
-
-	float *vn_def = ((float *)obj[vn]) + 1;
-	int	vn_def_count = ((float *)obj[vn])[0];
-
-	if (vn_def_count != 195844) {
-		printf("vn_def_count != 195844\n");
-		exit(0);
-	}
-
-	for (int i = 0; i != vn_def_count; i++) {
-		printf("vn % f % f % f % f\n", vn_def[0], vn_def[1], vn_def[2], vn_def[3]);
-		vn_def += 4;
-	}
-
-	int	**f_def = obj[f] + sizeof(int);
-	int f_def_count = *(int *)(obj[f]);
-
-	if (f_def_count != 192986) {
-		printf("f_def_count != 192986\n");
-		exit(0);
-	}
-
-	for (int i = 0; i != f_def_count; i++) {
-		int *polygon = f_def[i] + 1;
-		int polygon_vert_count = f_def[i][0];
-		printf("f ");
-		for (int j = 0; j != polygon_vert_count; j++) {
-			printf("%d/%d/%d", polygon[j * 3], polygon[j * 3 + 1], polygon[j * 3 + 2]);
-			if (j != polygon_vert_count - 1)
-				printf(" ");
-		}
-		printf("\n");
-	}
-
-	return (0);
-}
-
 int func(const char *path, int n) {
 	void	**data;
 
 	char *err;
 
 	void **object;
+	uint32_t	def_count_total[4];
 
-	data = (void **)wavefront_object_reader(path, &object, NULL, &err);
+	data = (void **)wavefront_object_reader(path, &object, def_count_total, &err);
 
 	if (!data) {
 		printf("%s\n", err);
 		exit(0);
 	}
+
+	GLuint *arr = wavefront_to_gl_arrays_converter(data, def_count_total, object, NULL);
+	if (arr == NULL)
+		exit(0);
+	n_count = arr[1 + n];
+	vao_id = arr[1 + arr[0] + n];
+	return (0);
 
 	uint32_t obj_count = *(uint32_t *)object;
 
@@ -248,23 +187,35 @@ int func(const char *path, int n) {
 		uint32_t	*def_count = ptr + MAX_NAME_LEN;
 		uint32_t	*offset = def_count + 4;
 
-		t_float4 *ver = data[v] + sizeof(float);
-		t_float4 *nor = data[vn] + sizeof(float);
-		t_float2 *tex = data[vt] + sizeof(float);
-		int	*pol = data[f] + sizeof(int);
+		uint32_t	t0[4], t1[4];
+		memcpy(t0, def_count, sizeof(uint32_t) * 4);
+		memcpy(t1, offset, sizeof(uint32_t) * 4);
 
-		void		*container[5] = {
-			ver + offset[v], nor + offset[vn], tex + offset[vt], pol + offset[f],
-			NULL
-		};
-
-		vb = wavefront_to_gl_vbo_converter(container, def_count);
+		vb = wavefront_to_gl_vbo_converter(data, def_count);
 	}
 
 	if (vb == NULL)
 		exit(0);
-	vbo_model = vb + 1;
+
 	n_count = *vb;
+
+	glGenVertexArrays(1, &vao_id);
+	glGenBuffers(1, &vbo_id);
+
+	glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(t_float4) * *vb * 2, vb + 1, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	glBindVertexArray(vao_id);
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, (const GLvoid *)0);
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, (const GLvoid *)(sizeof(t_float4) * n_count));
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+
+	free(vb);
 
 	/* float *normal_ptr = (void *)vb + sizeof(float) + sizeof(t_float4) * n_count + sizeof(t_float2) * n_count;
 	for (int i = 0; i != n_count; i++) {
@@ -273,77 +224,16 @@ int func(const char *path, int n) {
 	} */
 
 	return (0);
+}
 
-	// SDL_Surface *sfe = IMG_Load("/home/max/GL_ObjectViewer/resources/rocks.jpg");
-	// char *img = sfe->pixels;
-
-	// glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, sfe->w, sfe->h, 0, GL_RGB, GL_UNSIGNED_BYTE, img);
-
-	size_t		vertex_count = *((float *)data[v]);
-	float		*vertex = (float *)(data[v] + sizeof(float));
-
-	size_t		textr_count = *((float *)data[vt]);
-	float		*textr = (float *)(data[vt] + sizeof(float));
-
-	/*  */
-	v_count = vertex_count;
-	vertex_buffer = vertex;
-	/*  */
-
-	int			polygon_count = *((int*)data[f]);
-	int			**polygon = data[f] + sizeof(int);
-
-	int		object_count = *(int*)object;
-	void	*mesh = ((void **)((void*)object + sizeof(int)))[n];
-
-
-	int		mesh_polygon_count = ((int *)(mesh + MAX_NAME_LEN))[f];
-	int		**mesh_polygon = polygon + ((int *)(mesh + MAX_NAME_LEN))[f + 4];
-
-	int *triangles = NULL;
-
-	i_count = *triangles;
-	index_buffer = triangles + 1;
-
-	n_count = i_count * 3;
-	normal_buffer = calloc(n_count, sizeof(float) * 4);
-
-
-	t_float4 *v_buffer = calloc(vertex_count, sizeof(t_float4));
-	memcpy(v_buffer, vertex_buffer, vertex_count * sizeof(t_float4));
-
-	int	*txtr_buffer = triangles + 1 + i_count * 3;
-	for (int i = 0; i != n_count; i++) {
-		t_float4 vert = get_elem_from_float4(v_buffer, vertex_count, index_buffer[i]);
-		t_float2 tex = *(const t_float2 *)get_elem_from_array(textr, textr_count, sizeof(float) * 3, txtr_buffer[i]);
-		printf("vertice[%-3d]: % f % f % f, textr[%-3d]: % f % f\n", index_buffer[i] + 1, vert.x, vert.y, vert.z, txtr_buffer[i] + 1, tex.x, tex.y);
-	}
-
-	vbo_model = calloc(n_count * 2, sizeof(t_float4));
-	t_float4 *ptr = vbo_model;
-
-	for (int i = 0; i != n_count; i += 3) {
-		t_float4 p1, p2, p3;
-		p1 = get_elem_from_float4(v_buffer, vertex_count, index_buffer[i]);
-		p2 = get_elem_from_float4(v_buffer, vertex_count, index_buffer[i + 1]);
-		p3 = get_elem_from_float4(v_buffer, vertex_count, index_buffer[i + 2]);
-
-		t_float4 n = calc_triangle_normal(p1, p2, p3);
-
-		ptr[0] = p1;
-		ptr[1] = p2;
-		ptr[2] = p3;
-		(ptr + n_count)[0] = n;
-		(ptr + n_count)[1] = n;
-		(ptr + n_count)[2] = n;
-		ptr += 3;
-	}
-	/*  */
-
-	return 0;
+void error_callback_111(int code, const char* description)
+{
+    printf("%d %s\n", code, description);
 }
 
 int	main(int argc, char *argv[]) {
+
+	int ww = 1024, hh = 768;
 
 	// if (!IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG))
 		// exit(0);
@@ -352,24 +242,33 @@ int	main(int argc, char *argv[]) {
 	if (glfw_init()) {
 		return -1;
 	}
+	glfwSetErrorCallback(error_callback_111);
 	/* Init glfw window */
-	if (glfw_init_window(1280, 720, "GLViewer")) {
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	if (glfw_init_window(ww, hh, "GLViewer")) {
 		glfwTerminate();
 		return -1;
 	}
 	/* Make window's context current */
+ 
 	glfwMakeContextCurrent(window);
-
-	if (glad_init() != 0) {
+	/*if (glad_init() != 0) {
 		glfwTerminate();
 		return -1;
+	}*/
+
+	GLenum err = 0;
+	err = glGetError();
+	if (err != 0) {
+		printf("%d\n", err);
+		exit(0);
 	}
 
-	glEnable(GL_DEPTH_TEST);
-
-	func(argv[1], argc == 3 ? (int)ft_atof(argv[2]) : 0);
-	VBO_init();
-	VAO_init();
+	//VBO_init();
+	//VAO_init();
 
 	/*  */
 	GLuint program = create_program();
@@ -377,21 +276,37 @@ int	main(int argc, char *argv[]) {
 		exit(0);
 	}
 	glUseProgram(program);
+	err = glGetError();
+	if (err != 0) {
+		printf("%d\n", err);
+		exit(0);
+	}
 
-	GLuint p_uni = glGetUniformLocation(program, "ProjectionMatrix");
-	GLuint r_uni = glGetUniformLocation(program, "RotationMatrix");
-	GLuint t_uni = glGetUniformLocation(program, "TranslationMatrix");
+	GLuint r_uni = glGetUniformLocation(program, "rotation");
+	GLuint p_uni = glGetUniformLocation(program, "projection");
+	GLuint t_uni = glGetUniformLocation(program, "translation");
+	err = glGetError();
+		if (err != 0) {
+			printf("%d\n", err);
+			exit(0);
+		}
 
-	// projection_matrix(-1, 1, -1, 1, 2, 8, p_uni);
-	perspective_matrix(60 * pi / 180., 16. / 9., 0.128, 2048, p_uni);
+	perspective_matrix(60 * pi / 180., (double)ww / (double)hh, 0.128, 2048, p_uni);
 	rotation_matrix(0, 0, 0, 0, r_uni);
-	tranlsation_matrix(0, 0, 0, t_uni);
-	/*  */
+	tranlsation_matrix(0, 0, -4, t_uni);
+	err = glGetError();
+	if (err != 0) {
+		printf("%d\n", err);
+		exit(0);
+	}
+
+	func(argv[1], argc == 3 ? (int)ft_atof(argv[2]) : 0);
 
 	double angle = 0;
 
-	double x = 0, y = 0, z = -3;
+	double x = 0, y = 0, z = -4;
 
+	glEnable(GL_DEPTH_TEST);
 
 	while(!glfwWindowShouldClose(window)) {
 		// double b = glfwGetTime();
@@ -437,21 +352,24 @@ int	main(int argc, char *argv[]) {
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		/* glBindVertexArray(VAO_id);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, VBO[1]);
-		glDrawElements(GL_TRIANGLES, i_count * 3, GL_UNSIGNED_INT, (void*)0);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		glBindVertexArray(0); */
-
-		glBindBuffer(GL_ARRAY_BUFFER, VBO[2]);
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, (GLvoid *)0);
-		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, (GLvoid *)(sizeof(t_float4) * n_count/*  + sizeof(t_float2) * n_count */));
+		glBindVertexArray(vao_id);
 		glDrawArrays(GL_TRIANGLES, 0, n_count);
-		glDisableVertexAttribArray(1);
-		glDisableVertexAttribArray(0);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);
+		err = glGetError();
+		if (err != 0) {
+			printf("%d\n", err);
+			exit(0);
+		}
+
+		//glBindBuffer(GL_ARRAY_BUFFER, VBO[2]);
+		//glEnableVertexAttribArray(0);
+		//glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, (GLvoid *)0);
+		//glEnableVertexAttribArray(1);
+		//glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, (GLvoid *)(sizeof(t_float4) * n_count/*  + sizeof(t_float2) * n_count */));
+		//glDrawArrays(GL_TRIANGLES, 0, n_count);
+		//glDisableVertexAttribArray(1);
+		//glDisableVertexAttribArray(0);
+		//glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

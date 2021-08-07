@@ -2,7 +2,7 @@
 
 GLuint	load_shader(char *path, GLenum shader_type) {
 	char *file;
-	if (!(uint64_t)(file = ft_getfile(path, 0))) {
+	if (!(uint64_t)(file = ft_read_file_fstat(path))) {
 		char *message = "An error occurred during read shader\n";
 		write(2, message, strlen(message));
 		return 0;
@@ -16,7 +16,7 @@ GLuint	load_shader(char *path, GLenum shader_type) {
 		return 0;
 	}
 
-	glShaderSource(shader, 1, &file, null);
+	glShaderSource(shader, 1, &file, NULL);
 	free(file);
 
 	glCompileShader(shader);
@@ -28,11 +28,11 @@ GLuint	load_shader(char *path, GLenum shader_type) {
 		GLsizei message_length;
 
 		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &message_length);
-		if ((message = malloc(sizeof(GLchar) * message_length)) == null) {
+		if ((message = malloc(sizeof(GLchar) * message_length)) == NULL) {
 			glDeleteShader(shader);
 			return 0;
 		}
-		glGetShaderInfoLog(shader, message_length, null, message);
+		glGetShaderInfoLog(shader, message_length, NULL, message);
 		write(2, message, message_length - 1);
 		glDeleteShader(shader);
 		free(message);
@@ -65,11 +65,11 @@ GLuint	create_program() {
 		GLsizei message_length;
 
 		glGetProgramiv(program, GL_INFO_LOG_LENGTH, &message_length);
-		if ((message = malloc(sizeof(GLchar) * message_length)) == null) {
+		if ((message = malloc(sizeof(GLchar) * message_length)) == NULL) {
 			glDeleteProgram(program);
 			return 0;
 		}
-		glGetProgramInfoLog(program, message_length, null, message);
+		glGetProgramInfoLog(program, message_length, NULL, message);
 		write(2, message, message_length - 1);
 		glDeleteShader(program);
 		free(message);
