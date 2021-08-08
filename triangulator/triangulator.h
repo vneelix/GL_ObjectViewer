@@ -6,7 +6,7 @@
 /*   By: vneelix <vneelix@student.21-school.ru>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/07 20:42:44 by vneelix           #+#    #+#             */
-/*   Updated: 2021/08/07 22:18:41 by vneelix          ###   ########.fr       */
+/*   Updated: 2021/08/08 20:43:25 by vneelix          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,10 @@ int			polygon_handling(t_float4 *vertex,
 int			triangulate_polygon3d(t_float4 *polygon3d,
 				size_t polygon3d_vertex_count, int *out_triangle);
 
-float	*wavefront_to_gl_vbo_converter(void **data, uint32_t *object_data);
-GLuint	*wavefront_to_gl_arrays_converter(void **data, uint32_t *def_count, void **object, char *err);
+int			rewriter(void **data, float *vbo);
+int			*wavefront_to_gl_index_converter(t_float4 *vertex,
+				size_t vertex_count, int **polygon, size_t polygon_count);
+GLuint		*wavefront_to_gl_arrays_converter(
+				void **data, void **object, char **err);
 
 #endif

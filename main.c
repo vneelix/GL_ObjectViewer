@@ -156,7 +156,8 @@ void tranlsation_matrix(double x, double y, double z, GLuint uni) {
 	glUniformMatrix4fv(uni, 1, GL_TRUE, matrix);
 }
 
-int func(const char *path, int n) {
+int func(const char *path, int n, GLuint program,
+			uint32_t w, uint32_t h, GLuint r_uni, GLuint p_uni, GLuint t_uni) {
 	void	**data;
 
 	char *err;
@@ -171,57 +172,57 @@ int func(const char *path, int n) {
 		exit(0);
 	}
 
-	GLuint *arr = wavefront_to_gl_arrays_converter(data, def_count_total, object, NULL);
-	if (arr == NULL)
-		exit(0);
-	n_count = arr[1 + n];
-	vao_id = arr[1 + arr[0] + n];
-	return (0);
+	/* find max x,y,z components */
+	{
+		/*float		xMax = 0, yMax = 0, zMax = 0;*/
+		uint32_t	vertex_count = *(float *)data[v];
+		float		*vertex = data[v] + sizeof(float);
 
-	uint32_t obj_count = *(uint32_t *)object;
+		/*for (uint32_t i = 0; i != vertex_count; i++) {
+			if (fabs(vertex[i * 4]) > xMax)
+				xMax = fabs(vertex[i * 4]);
+			if (fabs(vertex[i * 4 + 1]) > yMax)
+				yMax = fabs(vertex[i * 4 + 1]);
+			if (fabs(vertex[i * 4 + 2]) > zMax)
+				zMax = fabs(vertex[i * 4 + 2]);
+		}*/
 
-	float *vb = NULL;
+		t_float4	xMin = {0}, xMax = {0};
+		t_float4	yMin = {0}, yMax = {0};
+		t_float4	zMin = {0}, zMax = {0};
+		for (uint32_t i = 0; i != vertex_count; i++) {
+			if (vertex[i * 4] > xMax.x)
+				memcpy(&xMax, vertex + i * 4, sizeof(t_float4));
+			if (vertex[i * 4 + 1] > yMax.y)
+				memcpy(&yMax, vertex + i * 4, sizeof(t_float4));
+			if (vertex[i * 4 + 2] > zMax.z)
+				memcpy(&zMax, vertex + i * 4, sizeof(t_float4));
 
-	for (int i = 0; i != 1; i++) {
-		void *ptr = ((void **)((void *)object + sizeof(uint32_t)))[n];
-		uint32_t	*def_count = ptr + MAX_NAME_LEN;
-		uint32_t	*offset = def_count + 4;
+			if (vertex[i * 4] < xMin.x)
+				memcpy(&xMin, vertex + i * 4, sizeof(t_float4));
+			if (vertex[i * 4 + 1] < yMin.y)
+				memcpy(&yMin, vertex + i * 4, sizeof(t_float4));
+			if (vertex[i * 4 + 2] < zMin.z)
+				memcpy(&zMin, vertex + i * 4, sizeof(t_float4));
+		}
 
-		uint32_t	t0[4], t1[4];
-		memcpy(t0, def_count, sizeof(uint32_t) * 4);
-		memcpy(t1, offset, sizeof(uint32_t) * 4);
-
-		vb = wavefront_to_gl_vbo_converter(data, def_count);
+		float xSegment = fabs(xMax.x - xMin.x);
+		float ySegment = fabs(yMax.y - yMin.y);
+		float zSegment = fabs(zMax.z - zMin.z);
+		/* init transformations */
+		perspective_matrix(60 * pi / 180., (double)w / (double)h, 0.128, 2048, p_uni);
+		rotation_matrix(0, 0, 0, 0, r_uni);
+		tranlsation_matrix(-(xSegment / 2 + xMin.x), -(ySegment / 2 + yMin.y), -4 - zSegment, t_uni);
 	}
 
-	if (vb == NULL)
+	GLuint *arr = wavefront_to_gl_arrays_converter(data, object, &err);
+	if (arr == NULL) {
+		printf("%s\n", err);
+		free(err);
 		exit(0);
-
-	n_count = *vb;
-
-	glGenVertexArrays(1, &vao_id);
-	glGenBuffers(1, &vbo_id);
-
-	glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(t_float4) * *vb * 2, vb + 1, GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	glBindVertexArray(vao_id);
-	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, (const GLvoid *)0);
-	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, (const GLvoid *)(sizeof(t_float4) * n_count));
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
-
-	free(vb);
-
-	/* float *normal_ptr = (void *)vb + sizeof(float) + sizeof(t_float4) * n_count + sizeof(t_float2) * n_count;
-	for (int i = 0; i != n_count; i++) {
-		printf("% f % f % f % f\n", normal_ptr[0], normal_ptr[1], normal_ptr[2], normal_ptr[3]);
-		normal_ptr += 4;
-	} */
+	}
+	n_count = arr[1 + n];
+	vao_id = arr[1 + arr[0] + n];
 
 	return (0);
 }
@@ -233,7 +234,7 @@ void error_callback_111(int code, const char* description)
 
 int	main(int argc, char *argv[]) {
 
-	int ww = 1024, hh = 768;
+	int w = 1024, h = 768;
 
 	// if (!IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG))
 		// exit(0);
@@ -248,7 +249,7 @@ int	main(int argc, char *argv[]) {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	if (glfw_init_window(ww, hh, "GLViewer")) {
+	if (glfw_init_window(w, h, "GLViewer")) {
 		glfwTerminate();
 		return -1;
 	}
@@ -282,25 +283,11 @@ int	main(int argc, char *argv[]) {
 		exit(0);
 	}
 
-	GLuint r_uni = glGetUniformLocation(program, "rotation");
-	GLuint p_uni = glGetUniformLocation(program, "projection");
-	GLuint t_uni = glGetUniformLocation(program, "translation");
-	err = glGetError();
-		if (err != 0) {
-			printf("%d\n", err);
-			exit(0);
-		}
+	GLuint	r_uni = glGetUniformLocation(program, "rotation");
+	GLuint	p_uni = glGetUniformLocation(program, "projection");
+	GLuint	t_uni = glGetUniformLocation(program, "translation");
 
-	perspective_matrix(60 * pi / 180., (double)ww / (double)hh, 0.128, 2048, p_uni);
-	rotation_matrix(0, 0, 0, 0, r_uni);
-	tranlsation_matrix(0, 0, -4, t_uni);
-	err = glGetError();
-	if (err != 0) {
-		printf("%d\n", err);
-		exit(0);
-	}
-
-	func(argv[1], argc == 3 ? (int)ft_atof(argv[2]) : 0);
+	func(argv[1], argc == 3 ? (int)ft_atof(argv[2]) : 0, program, w, h, r_uni, p_uni, t_uni);
 
 	double angle = 0;
 

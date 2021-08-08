@@ -10,7 +10,7 @@
 			"type": "cppdbg",
 			"request": "launch",
 			"program": "${workspaceFolder}/program",
-			"args": ["/Users/vneelix/GL_ObjectViewer/resources/temp.obj"],
+			"args": ["/Users/vneelix/GL_ObjectViewer/resources/rect.obj"],
 			"stopAtEntry": false,
 			"cwd": "${workspaceFolder}",
 			"environment": [],

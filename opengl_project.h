@@ -12,7 +12,7 @@
 #include <string.h>
 #include <strings.h>
 
-#include "libft.h"
+#include "minilib.h"
 #include <OpenGL/gl3.h>
 #include "GLFW/glfw3.h"
 

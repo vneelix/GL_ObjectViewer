@@ -6,7 +6,7 @@
 /*   By: vneelix <vneelix@student.21-school.ru>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/27 15:16:25 by vneelix           #+#    #+#             */
-/*   Updated: 2021/08/07 21:01:41 by vneelix          ###   ########.fr       */
+/*   Updated: 2021/08/08 20:40:35 by vneelix          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,4 +70,41 @@ int	polygon_handling(t_float4 *vertex,
 		return (-1);
 	convert_indexes(polygon, writer);
 	return (0);
+}
+
+static int	init_writer(void **writer, int *index_array, size_t tre_count)
+{
+	writer[0] = (void *)(index_array + 1);
+	writer[1] = (void *)(index_array + 1 + 3 * tre_count);
+	writer[2] = (void *)(index_array + 1 + 6 * tre_count);
+	return (0);
+}
+
+int	*wavefront_to_gl_index_converter(t_float4 *vertex,
+		size_t vertex_count, int **polygon, size_t polygon_count)
+{
+	size_t		i;
+	size_t		tre_count;
+	int			*writer[3];
+	int			*index_array;
+
+	i = 0;
+	tre_count = model_triangles_count(polygon, polygon_count);
+	if (tre_count == 0)
+		return (NULL);
+	index_array = (int *)calloc(sizeof(int) + sizeof(int) * tre_count * 9, 1);
+	if (!index_array)
+		return (NULL);
+	init_writer((void **)writer, index_array, tre_count);
+	while (i != polygon_count)
+	{
+		if (polygon_handling(vertex, vertex_count, polygon[i], writer) == -1)
+		{
+			free(index_array);
+			return (NULL);
+		}
+		i++;
+	}
+	*index_array = (int)tre_count * 3;
+	return (index_array);
 }

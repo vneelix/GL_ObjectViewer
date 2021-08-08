@@ -5,36 +5,48 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: vneelix <vneelix@student.21-school.ru>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/08/08 20:29:01 by vneelix           #+#    #+#             */
-/*   Updated: 2021/08/08 20:45:47 by vneelix          ###   ########.fr       */
+/*   Created: 2021/08/07 20:55:54 by vneelix           #+#    #+#             */
+/*   Updated: 2021/08/08 19:42:16 by vneelix          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "triangulator.h"
 
-int	generate_error_message(int err_code,
-	const char *target, const char *reason, char **err)
+int	init_writer(void **writer, int *index_array, size_t tre_count)
 {
-	char	*buff;
-	size_t	target_len;
-	size_t	reason_len;
+	writer[0] = (void *)(index_array + 1);
+	writer[1] = (void *)(index_array + 1 + 3 * tre_count);
+	writer[2] = (void *)(index_array + 1 + 6 * tre_count);
+	return (0);
+}
 
-	if (target == NULL || reason == NULL || err == NULL)
-		return (err_code);
-	target_len = strlen(target);
-	reason_len = strlen(reason);
-	buff = (char *)calloc(target_len + reason_len + 2, 1);
-	if (buff == NULL)
+int	*wavefront_to_gl_index_converter(t_float4 *vertex,
+		size_t vertex_count, int **polygon, size_t polygon_count)
+{
+	size_t		i;
+	size_t		tre_count;
+	int			*writer[3];
+	int			*index_array;
+
+	i = 0;
+	tre_count = model_triangles_count(polygon, polygon_count);
+	if (tre_count == 0)
+		return (NULL);
+	index_array = (int *)calloc(sizeof(int) + sizeof(int) * tre_count * 9, 1);
+	if (!index_array)
+		return (NULL);
+	init_writer((void **)writer, index_array, tre_count);
+	while (i != polygon_count)
 	{
-		if (err)
-			*err = NULL;
-		return (err_code);
+		if (polygon_handling(vertex, vertex_count, polygon[i], writer) == -1)
+		{
+			free(index_array);
+			return (NULL);
+		}
+		i++;
 	}
-	buff[target_len] = ':';
-	memcpy(buff, target, target_len);
-	memcpy(buff + target_len + 1, reason, reason_len);
-	*err = buff;
-	return (err_code);
+	*index_array = (int)tre_count * 3;
+	return (index_array);
 }
 
 int	write_elements_into_vbo(void **data, int *index_array, float *vbo)
@@ -111,6 +123,95 @@ int	write_to_vao(GLuint vao, GLuint vbo, float *data)
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 	return (0);
+}
+
+t_float4	calc_triangle_normal(t_float4 p1, t_float4 p2, t_float4 p3)
+{
+	t_float4	u;
+	t_float4	v;
+
+	u = p2 - p1;
+	v = p3 - p2;
+	return (normalize(cross(u, v)));
+}
+
+int	rewrite_normal(float *data, uint32_t i)
+{
+	float		*p;
+	t_float4	normal;
+	t_float4	triangle[3];
+
+	p = data + 1;
+	memcpy(triangle, p + i * 4, sizeof(t_float4) * 3);
+	normal = calc_triangle_normal(triangle[0], triangle[1], triangle[2]);
+	memcpy(p + (uint32_t)(
+			*data) * 4 + i * 4 + 0 * 4, &normal, sizeof(t_float4));
+	memcpy(p + (uint32_t)(
+			*data) * 4 + i * 4 + 1 * 4, &normal, sizeof(t_float4));
+	memcpy(p + (uint32_t)(
+			*data) * 4 + i * 4 + 2 * 4, &normal, sizeof(t_float4));
+	return (0);
+}
+
+int	rewrite_texture_coord(float *data, uint32_t i)
+{
+	float		*p;
+	t_float2	triangle[6];
+
+	p = data + 1;
+	triangle[0] = (t_float2){0, 1};
+	triangle[1] = (t_float2){0, 0};
+	triangle[2] = (t_float2){1, 0};
+	triangle[3] = (t_float2){1, 0};
+	triangle[4] = (t_float2){1, 1};
+	triangle[5] = (t_float2){0, 1};
+	memcpy(p + (uint32_t)(
+			*data) * 8 + i * 2, triangle + 3 * (i % 2), sizeof(t_float2) * 3);
+	return (0);
+}
+
+int	rewriter(void **data, float *vbo)
+{
+	uint32_t	i;
+
+	if (*(float *)data[vn] != 0
+		&& *(float *)data[vt] != 0)
+		return (0);
+	i = 0;
+	while (i != (uint32_t)(*vbo))
+	{
+		if (*(float *)data[vn] == 0)
+			rewrite_normal(vbo, i);
+		if (*(float *)data[vt] == 0)
+			rewrite_texture_coord(vbo, i);
+		i += 3;
+	}
+	return (0);
+}
+
+int	generate_error_message(int err_code,
+	const char *target, const char *reason, char **err)
+{
+	char	*buff;
+	size_t	target_len;
+	size_t	reason_len;
+
+	if (target == NULL || reason == NULL || err == NULL)
+		return (err_code);
+	target_len = strlen(target);
+	reason_len = strlen(reason);
+	buff = (char *)calloc(target_len + reason_len + 2, 1);
+	if (buff == NULL)
+	{
+		if (err)
+			*err = NULL;
+		return (err_code);
+	}
+	buff[target_len] = ':';
+	memcpy(buff, target, target_len);
+	memcpy(buff + target_len + 1, reason, reason_len);
+	*err = buff;
+	return (err_code);
 }
 
 int	wavefront_to_vao(void **data,

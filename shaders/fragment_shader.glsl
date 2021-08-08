@@ -26,9 +26,9 @@ void main()
 	float	diffuseRatio = clamp(0., 1., dot(normal, lightVec)) * LIGHT_INTENSE + AMBIENT;
 	vec4	reflectLightVec = 2 * normal * dot(normal, lightVec) - lightVec;
 	float	specularRatio = pow(clamp(0., 1., dot(toCameraVec, reflectLightVec)), 64);
-	/*  */
-
 	vec4	objectColor = input_data.color * (1. - specularRatio) * diffuseRatio;
 	vec4	specularColor = vec4(1, 1, 1, 1) * specularRatio * LIGHT_INTENSE;
+	/*  */
+
     fragColor = clamp(vec4(0, 0, 0, 1), vec4(1, 1, 1, 1), objectColor + specularRatio);
 }

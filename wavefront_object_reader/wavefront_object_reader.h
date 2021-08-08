@@ -1,7 +1,7 @@
 #ifndef OBJ_READER_H
 #define OBJ_READER_H
 
-#include "libft.h"
+#include "minilib.h"
 
 #include <stdlib.h>
 #include <string.h>
