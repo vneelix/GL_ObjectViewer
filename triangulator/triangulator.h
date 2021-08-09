@@ -6,7 +6,7 @@
 /*   By: vneelix <vneelix@student.21-school.ru>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/07 20:42:44 by vneelix           #+#    #+#             */
-/*   Updated: 2021/08/08 20:43:25 by vneelix          ###   ########.fr       */
+/*   Updated: 2021/08/09 19:55:01 by vneelix          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,5 +55,8 @@ int			*wavefront_to_gl_index_converter(t_float4 *vertex,
 				size_t vertex_count, int **polygon, size_t polygon_count);
 GLuint		*wavefront_to_gl_arrays_converter(
 				void **data, void **object, char **err);
+
+int			error_callback(int err_code,
+				const char *target, const char *reason, char **err);
 
 #endif

@@ -1,2 +1,0 @@
-#!/bin/bash
-clang -O2 -Wall -Wextra main.c wavefront*.c wavefront_object_definition/*.c -I. -I../libft/inc ../libft/src/*.c -lm -o program

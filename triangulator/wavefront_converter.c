@@ -6,36 +6,11 @@
 /*   By: vneelix <vneelix@student.21-school.ru>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/08 20:29:01 by vneelix           #+#    #+#             */
-/*   Updated: 2021/08/08 20:45:47 by vneelix          ###   ########.fr       */
+/*   Updated: 2021/08/09 19:55:28 by vneelix          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "triangulator.h"
-
-int	generate_error_message(int err_code,
-	const char *target, const char *reason, char **err)
-{
-	char	*buff;
-	size_t	target_len;
-	size_t	reason_len;
-
-	if (target == NULL || reason == NULL || err == NULL)
-		return (err_code);
-	target_len = strlen(target);
-	reason_len = strlen(reason);
-	buff = (char *)calloc(target_len + reason_len + 2, 1);
-	if (buff == NULL)
-	{
-		if (err)
-			*err = NULL;
-		return (err_code);
-	}
-	buff[target_len] = ':';
-	memcpy(buff, target, target_len);
-	memcpy(buff + target_len + 1, reason, reason_len);
-	*err = buff;
-	return (err_code);
-}
 
 int	write_elements_into_vbo(void **data, int *index_array, float *vbo)
 {
@@ -126,14 +101,14 @@ int	wavefront_to_vao(void **data,
 		ptr = wavefront_to_gl_vbo_converter(data,
 				((void **)((uint32_t *)object + 1))[i] + MAX_NAME_LEN);
 		if (ptr == NULL)
-			return (generate_error_message(-1, ((void **)((uint32_t *)
+			return (error_callback(-1, ((void **)((uint32_t *)
 						object + 1))[i], "failed to triangulate", err));
 		rewriter(data, ptr);
 		arr[1 + i] = *ptr;
 		ret = write_to_vao(arr[1 + arr[0] + i], arr[1 + 2 * arr[0] + i], ptr);
 		free(ptr);
 		if (ret)
-			return (generate_error_message(-1, ((void **)((uint32_t *)
+			return (error_callback(-1, ((void **)((uint32_t *)
 						object + 1))[i], "failed to write data to VAO", err));
 		i++;
 	}
@@ -148,7 +123,7 @@ GLuint	*wavefront_to_gl_arrays_converter(
 	arr = calloc(
 			sizeof(uint32_t) + sizeof(GLuint) * *(uint32_t *)object * 3, 1);
 	if (arr == NULL)
-		return ((void *)(uint64_t)generate_error_message(
+		return ((void *)(uint64_t)error_callback(
 				0, "VAO", "failed to allocate memory", err));
 	*arr = *(uint32_t *)object;
 	glGenVertexArrays(*(uint32_t *)object, arr + 1 + *(uint32_t *)object);

@@ -6,7 +6,7 @@
 /*   By: vneelix <vneelix@student.21-school.ru>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/26 18:44:59 by vneelix           #+#    #+#             */
-/*   Updated: 2021/07/26 18:49:16 by vneelix          ###   ########.fr       */
+/*   Updated: 2021/08/09 21:32:45 by vneelix          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,15 +15,7 @@
 static int	object_definition_handler(const char *definition,
 			void **out_object, unsigned int i, char **out_err)
 {
-	int	ret;
-
-	if (i == MAX_OBJ_COUNT)
-		return (error_callback(-1,
-				"The limit of objects has been reached", out_err));
-	ret = change_object(definition, out_object + i, i == 0);
-	if (ret == -1)
-		return (error_callback(-1, "The object is incomplete", out_err));
-	return (ret);
+	return (change_object(definition, out_object + i, i, out_err));
 }
 
 static int	wavefront_object_analyzer(const char **wf_file,
@@ -37,7 +29,8 @@ static int	wavefront_object_analyzer(const char **wf_file,
 	{
 		if (def_handler(*wf_file,
 				out_object[i] + MAX_NAME_LEN, container[0]) == -1)
-			return (error_callback(-1, *wf_file, out_err));
+			return (error_callback(
+					-1, *wf_file, "invalid definition", out_err));
 		if (!strncmp(*wf_file, "o ", 2) || !strncmp(*wf_file, "o\t", 2))
 		{
 			ret = object_definition_handler(*wf_file, out_object, i, out_err);
@@ -115,8 +108,8 @@ void	*wavefront_object_get(const char **wf_file,
 	if (wf_object == NULL)
 	{
 		free(object);
-		return ((void *)(uint64_t)
-			error_callback(0, "Load wavefront model failed", out_err));
+		return ((void *)(uint64_t)error_callback(
+				0, "wavefront object", "failed to load", out_err));
 	}
 	if (out_object)
 		*out_object = object;

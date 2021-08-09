@@ -215,6 +215,12 @@ int func(const char *path, int n, GLuint program,
 		tranlsation_matrix(-(xSegment / 2 + xMin.x), -(ySegment / 2 + yMin.y), -4 - zSegment, t_uni);
 	}
 
+	if (0) {
+		*(uint32_t *)object = 1;
+		void **obj_ptr = (void *)object + sizeof(uint32_t);
+		memset(obj_ptr[0] + MAX_NAME_LEN, 0, sizeof(uint32_t) * 8);
+		memcpy(obj_ptr[0] + MAX_NAME_LEN, def_count_total, sizeof(uint32_t) * 4);
+	}
 	GLuint *arr = wavefront_to_gl_arrays_converter(data, object, &err);
 	if (arr == NULL) {
 		printf("%s\n", err);
@@ -231,6 +237,10 @@ void error_callback_111(int code, const char* description)
 {
     printf("%d %s\n", code, description);
 }
+
+#include "opengl_init.h"
+GLuint	program_get(const char *vertex_shader,
+		const char *fragment_shader, char **err);
 
 int	main(int argc, char *argv[]) {
 
@@ -272,8 +282,11 @@ int	main(int argc, char *argv[]) {
 	//VAO_init();
 
 	/*  */
-	GLuint program = create_program();
+	char *q;
+	GLuint program = program_get("shaders/vertex_shader.glsl", "shaders/fragment_shader.glsl", &q);
 	if (!program) {
+		printf("%s\n", q);
+		free(q);
 		exit(0);
 	}
 	glUseProgram(program);
