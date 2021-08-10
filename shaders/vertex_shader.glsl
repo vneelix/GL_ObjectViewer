@@ -7,6 +7,10 @@ uniform mat4	rotation;
 uniform mat4	projection;
 uniform mat4	translation;
 
+uniform mat4	rotation_axisx;
+uniform mat4	rotation_axisy;
+uniform mat4	rotation_axisz;
+
 out	DATA {
 	/* object data */
 	vec4	position;
@@ -21,9 +25,9 @@ out	DATA {
 void main()
 {
 	/* write object data */
-    gl_Position = projection * translation * rotation * position;
-	output_data.position = translation * rotation * position;
-	output_data.normal = normalize(rotation * normal);
+    gl_Position = projection * translation * position;
+	output_data.position = translation * position;
+	output_data.normal = normalize(normal);
 	output_data.color = vec4(0, 0, 1, 1);
 
 	/* write area data */

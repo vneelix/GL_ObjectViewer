@@ -5,6 +5,7 @@
 
 /* typedefs of vector extensions */
 
+typedef unsigned int	t_uint2 __attribute__((ext_vector_type(2)));
 typedef float		t_float2 __attribute__((ext_vector_type(2)));
 typedef float		t_float4 __attribute__((ext_vector_type(4)));
 typedef float		t_float16 __attribute__((ext_vector_type(16)));

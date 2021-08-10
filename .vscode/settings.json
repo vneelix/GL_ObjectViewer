@@ -4,6 +4,7 @@
 		"vector.h": "c",
 		"wavefront_object_reader.h": "c",
 		"minilib.h": "c",
-		"opengl_init.h": "c"
+		"opengl_init.h": "c",
+		"opengl_project.h": "c"
 	}
 }
