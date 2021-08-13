@@ -6,7 +6,7 @@
 /*   By: vneelix <vneelix@student.21-school.ru>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/10 21:38:39 by vneelix           #+#    #+#             */
-/*   Updated: 2021/08/11 01:34:42 by vneelix          ###   ########.fr       */
+/*   Updated: 2021/08/13 03:42:54 by vneelix          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,16 +23,26 @@
 # include <stdlib.h>
 # include <string.h>
 # include <strings.h>
+# include <OpenGL/gl3.h>
 
 # include "minilib.h"
 # include "opengl_init.h"
-# include <OpenGL/gl3.h>
 # include "GLFW/glfw3.h"
+
+# include "interface.h"
+
+
+# define W 1280
+# define H 800
+# define ROTATION_SPEED_X (M_PI / 180.)
+# define ROTATION_SPEED_Y (M_PI / 180.)
 
 typedef struct s_gl_renderer {
 	t_opengl	gl;
 	float		fov;
 	t_uint2		canvas;
+
+	void		**object;
 
 	GLuint		obj_count;
 	GLuint		*vtx_array;
@@ -41,8 +51,18 @@ typedef struct s_gl_renderer {
 	GLuint		*model_data;
 
 	t_float4	axis_offset;
-	t_float4	axis_angles;
+
+	uint32_t	flags;
+
+	t_ife		*ife;
+	void		*scroll_widget;
 }	t_gl_renderer;
+
+int	gl_renderer_format_model(t_gl_renderer *gl_renderer);
+int	gl_model_find_axis_borders(float *vertex, t_float4 *axis_border);
+int	gl_renderer_calc_axis_offset(t_gl_renderer *gl_renderer, void **data);
+int	gl_uniforms_init(t_gl_renderer *gl_renderer);
+int	gl_load_texture(const char *image_path, GLuint texture, char **err);
 
 int	gl_renderer_release(t_gl_renderer *gl_renderer, int err_code);
 int	gl_renderer_init(t_gl_renderer *gl_renderer,

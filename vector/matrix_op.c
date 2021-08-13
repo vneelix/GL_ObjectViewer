@@ -6,7 +6,7 @@
 /*   By: vneelix <vneelix@student.21-school.ru>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/10 20:48:57 by vneelix           #+#    #+#             */
-/*   Updated: 2021/07/15 01:05:47 by vneelix          ###   ########.fr       */
+/*   Updated: 2021/08/12 20:29:11 by vneelix          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,32 +79,33 @@ t_float2 __attribute__((overloadable)) mul(t_matrix2x2 a, t_float2 b)
 
 t_float4 __attribute__((overloadable)) mul(t_matrix4x4 a, t_float4 b)
 {
-	a = transpose(a);
-	return transpose(((t_float4 *)&a)[0] * b.x
-				+ ((t_float4 *)&a)[1] * b.y + ((t_float4 *)&a)[2] * b.z + ((t_float4 *)&a)[3] * b.w);
+a = transpose(a);
+return transpose(((t_float4 *)&a)[0] * b.x
+	+ ((t_float4 *)&a)[1] * b.y
+		+ ((t_float4 *)&a)[2] * b.z + ((t_float4 *)&a)[3] * b.w);
 }
 
 t_matrix4x4 __attribute__((overloadable)) mul(t_matrix4x4 a, t_matrix4x4 b)
 {
-	t_matrix4x4 m;
+t_matrix4x4 m;
 
-	a = transpose(a);
-	b = transpose(b);
-	((t_float4 *)&m)[0] = ((t_float4 *)&a)[0] * ((t_float4 *)&b)[0].x
-		+ ((t_float4 *)&a)[1] * ((t_float4 *)&b)[0].y
-			+ ((t_float4 *)&a)[2] * ((t_float4 *)&b)[0].z
-				+ ((t_float4 *)&a)[3] * ((t_float4 *)&b)[0].w;
-	((t_float4 *)&m)[1] = ((t_float4 *)&a)[0] * ((t_float4 *)&b)[1].x
-		+ ((t_float4 *)&a)[1] * ((t_float4 *)&b)[1].y
-			+ ((t_float4 *)&a)[2] * ((t_float4 *)&b)[1].z
-				+ ((t_float4 *)&a)[3] * ((t_float4 *)&b)[1].w;
-	((t_float4 *)&m)[2] = ((t_float4 *)&a)[0] * ((t_float4 *)&b)[2].x
-		+ ((t_float4 *)&a)[1] * ((t_float4 *)&b)[2].y
-			+ ((t_float4 *)&a)[2] * ((t_float4 *)&b)[2].z
-				+ ((t_float4 *)&a)[3] * ((t_float4 *)&b)[2].w;
-	((t_float4 *)&m)[3] = ((t_float4 *)&a)[0] * ((t_float4 *)&b)[3].x
-		+ ((t_float4 *)&a)[1] * ((t_float4 *)&b)[3].y
-			+ ((t_float4 *)&a)[2] * ((t_float4 *)&b)[3].z
-				+ ((t_float4 *)&a)[3] * ((t_float4 *)&b)[3].w;
-	return (transpose(m));
+a = transpose(a);
+b = transpose(b);
+((t_float4 *)&m)[0] = ((t_float4 *)&a)[0] * ((t_float4 *)&b)[0].x
+	+ ((t_float4 *)&a)[1] * ((t_float4 *)&b)[0].y
+		+ ((t_float4 *)&a)[2] * ((t_float4 *)&b)[0].z
+			+ ((t_float4 *)&a)[3] * ((t_float4 *)&b)[0].w;
+((t_float4 *)&m)[1] = ((t_float4 *)&a)[0] * ((t_float4 *)&b)[1].x
+	+ ((t_float4 *)&a)[1] * ((t_float4 *)&b)[1].y
+		+ ((t_float4 *)&a)[2] * ((t_float4 *)&b)[1].z
+			+ ((t_float4 *)&a)[3] * ((t_float4 *)&b)[1].w;
+((t_float4 *)&m)[2] = ((t_float4 *)&a)[0] * ((t_float4 *)&b)[2].x
+	+ ((t_float4 *)&a)[1] * ((t_float4 *)&b)[2].y
+		+ ((t_float4 *)&a)[2] * ((t_float4 *)&b)[2].z
+			+ ((t_float4 *)&a)[3] * ((t_float4 *)&b)[2].w;
+((t_float4 *)&m)[3] = ((t_float4 *)&a)[0] * ((t_float4 *)&b)[3].x
+	+ ((t_float4 *)&a)[1] * ((t_float4 *)&b)[3].y
+		+ ((t_float4 *)&a)[2] * ((t_float4 *)&b)[3].z
+			+ ((t_float4 *)&a)[3] * ((t_float4 *)&b)[3].w;
+return (transpose(m));
 }

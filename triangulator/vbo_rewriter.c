@@ -6,7 +6,7 @@
 /*   By: vneelix <vneelix@student.21-school.ru>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/08 20:30:04 by vneelix           #+#    #+#             */
-/*   Updated: 2021/08/08 20:41:25 by vneelix          ###   ########.fr       */
+/*   Updated: 2021/08/13 00:30:18 by vneelix          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,18 +42,16 @@ static int	rewrite_normal(float *data, uint32_t i)
 
 static int	rewrite_texture_coord(float *data, uint32_t i)
 {
-	float		*p;
 	t_float2	triangle[6];
 
-	p = data + 1;
-	triangle[0] = (t_float2){0, 1};
+	triangle[0] = (t_float2){1, 1};
 	triangle[1] = (t_float2){0, 0};
-	triangle[2] = (t_float2){1, 0};
-	triangle[3] = (t_float2){1, 0};
+	triangle[2] = (t_float2){0, 1};
+	triangle[3] = (t_float2){0, 0};
 	triangle[4] = (t_float2){1, 1};
-	triangle[5] = (t_float2){0, 1};
-	memcpy(p + (uint32_t)(
-			*data) * 8 + i * 2, triangle + 3 * (i % 2), sizeof(t_float2) * 3);
+	triangle[5] = (t_float2){1, 0};
+	memcpy(&data[1 + (uint32_t)(*data) * 8 + i * 2],
+		triangle + 3 * (i % 2), sizeof(t_float2) * 3);
 	return (0);
 }
 

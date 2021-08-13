@@ -1,3 +1,3 @@
 #!/bin/bash
 rm -rf program program.dSym && clear &&
-clang -Wall -Wextra -O2 *.c opengl_init/*.c triangulator/*.c wavefront_object_reader/*.c wavefront_object_reader/wavefront_object_definition/*.c minilib/src/*.c vector/*.c -Ivector -Iwavefront_object_reader/ -Iminilib/inc -Itriangulator -Iopengl_init `pkg-config --cflags --libs --static glfw3` -framework OpenGL -framework Cocoa -lSDL2 -lSDL2_image -I/usr/include/SDL2 -o program
+clang -Wall -Wextra -O2 *.c gl_renderer_init/*.c opengl_init/*.c triangulator/*.c wavefront_object_reader/*.c wavefront_object_reader/wavefront_object_definition/*.c minilib/src/*.c vector/*.c SDL_interface/*.c -ISDL_interface -Ivector -Iwavefront_object_reader/ -Iminilib/inc -Itriangulator -Iopengl_init `pkg-config --cflags --libs --static glfw3` -framework OpenGL -framework Cocoa -lSDL2 -lSDL2_image -lSDL2_ttf -I/usr/include/SDL2 -o program

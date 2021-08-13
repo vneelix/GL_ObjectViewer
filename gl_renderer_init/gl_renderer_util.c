@@ -1,27 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   file.c                                             :+:      :+:    :+:   */
+/*   gl_renderer_util.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vneelix <vneelix@student.21-school.ru>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/10 21:51:16 by vneelix           #+#    #+#             */
-/*   Updated: 2021/08/11 01:50:23 by vneelix          ###   ########.fr       */
+/*   Updated: 2021/08/13 00:29:03 by vneelix          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "opengl_project.h"
-
-int	gl_renderer_release(t_gl_renderer *gl_renderer, int err_code)
-{
-	if (gl_renderer->gl.program != 0)
-		glDeleteProgram(gl_renderer->gl.program);
-	glDeleteBuffers(gl_renderer->obj_count, gl_renderer->vbo_array);
-	glDeleteVertexArrays(gl_renderer->obj_count, gl_renderer->vao_array);
-	if (gl_renderer->model_data != NULL)
-		free(gl_renderer->model_data);
-	return (err_code);
-}
 
 int	gl_renderer_format_model(t_gl_renderer *gl_renderer)
 {
@@ -62,6 +51,7 @@ int	gl_model_find_axis_borders(float *vertex, t_float4 *axis_border)
 
 int	gl_renderer_calc_axis_offset(t_gl_renderer *gl_renderer, void **data)
 {
+	t_float4	center;
 	t_float4	axis_border[6];
 
 	gl_model_find_axis_borders(data[v], axis_border);
@@ -71,48 +61,29 @@ int	gl_renderer_calc_axis_offset(t_gl_renderer *gl_renderer, void **data)
 		-4 - (axis_border[4].z - axis_border[5].z),
 		0
 	};
-	return (0);
-}
-
-int	gl_renderer_matrix_init(t_gl_renderer *gl_renderer)
-{
+	center = (t_float4){
+		axis_border[1].x + (axis_border[0].x - axis_border[1].x) / 2,
+		axis_border[3].y + (axis_border[2].y - axis_border[3].y) / 2,
+		axis_border[5].z + (axis_border[4].z - axis_border[5].z) / 2,
+		1
+	};
 	glUseProgram(gl_renderer->gl.program);
-	translation_matrix(gl_renderer->axis_offset.x, gl_renderer->axis_offset.y,
-		gl_renderer->axis_offset.z, gl_renderer->gl.translation_matrix);
-	rotation_matrix(gl_renderer->axis_angles.x,
-		(t_float4){1, 0, 0, 0}, gl_renderer->gl.rotation_axisx_matrix);
-	rotation_matrix(gl_renderer->axis_angles.y,
-		(t_float4){0, 1, 0, 0}, gl_renderer->gl.rotation_axisy_matrix);
-	rotation_matrix(gl_renderer->axis_angles.z,
-		(t_float4){0, 0, 1, 0}, gl_renderer->gl.rotation_axisz_matrix);
-	perspective_projection_matrix(gl_renderer->fov,
-		(double)gl_renderer->canvas.x / gl_renderer->canvas.y,
-		(t_float2){0.128, 512}, gl_renderer->gl.projection_matrix);
+	glUniform4fv(gl_renderer->gl.center, 1, (const GLfloat *)&center);
 	glUseProgram(0);
 	return (0);
 }
 
-int	gl_renderer_init(t_gl_renderer *gl_renderer,
-	const char *wavefront_object_path, char **err)
+int	gl_uniforms_init(t_gl_renderer *gl_renderer)
 {
-	void	**data;
-	void	**object;
-
-	if (gl_init(&gl_renderer->gl,
-			"shaders/vertex_shader.glsl", "shaders/fragment_shader.glsl", err))
-		return (-1);
-	data = wavefront_object_reader(
-			wavefront_object_path, (void **)&object, NULL, err);
-	if (data == NULL)
-		return (gl_renderer_release(gl_renderer, -1));
-	gl_renderer->model_data
-		= wavefront_to_gl_arrays_converter(data, object, err);
-	free(object);
-	if (gl_renderer->model_data == NULL)
-		return (gl_renderer_release(gl_renderer, -1));
-	gl_renderer_format_model(gl_renderer);
-	gl_renderer_calc_axis_offset(gl_renderer, data);
-	gl_renderer_matrix_init(gl_renderer);
-	free(data);
+	glUseProgram(gl_renderer->gl.program);
+	rotation_matrix(0, (t_float4){1, 0, 0, 0}, gl_renderer->gl.rotation_matrix);
+	translation_matrix(gl_renderer->axis_offset.x, gl_renderer->axis_offset.y,
+		gl_renderer->axis_offset.z, gl_renderer->gl.translation_matrix);
+	perspective_projection_matrix(gl_renderer->fov,
+		(double)gl_renderer->canvas.x / gl_renderer->canvas.y,
+		(t_float2){0.128, 512}, gl_renderer->gl.projection_matrix);
+	color_init((t_float4){1, 1, 1, 1}, gl_renderer->gl.color);
+	glUniform1f(gl_renderer->gl.mode, 0);
+	glUseProgram(0);
 	return (0);
 }

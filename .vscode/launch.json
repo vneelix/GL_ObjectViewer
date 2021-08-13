@@ -9,7 +9,7 @@
 			"type": "cppdbg",
 			"request": "launch",
 			"program": "${workspaceFolder}/program",
-			"args": ["/Users/vneelix/GL_ObjectViewer/examples/box.obj"],
+			"args": ["/Users/vneelix/GL_ObjectViewer/examples/extra-teapot.obj", "-fn"],
 			"stopAtEntry": false,
 			"cwd": "${workspaceFolder}",
 			"environment": [],

@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   vector.h                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vneelix <vneelix@student.21-school.ru>     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/08/12 20:29:42 by vneelix           #+#    #+#             */
+/*   Updated: 2021/08/12 20:57:17 by vneelix          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef VECTOR_H
 # define VECTOR_H
 
@@ -6,11 +18,11 @@
 /* typedefs of vector extensions */
 
 typedef unsigned int	t_uint2 __attribute__((ext_vector_type(2)));
-typedef float		t_float2 __attribute__((ext_vector_type(2)));
-typedef float		t_float4 __attribute__((ext_vector_type(4)));
-typedef float		t_float16 __attribute__((ext_vector_type(16)));
-typedef t_float4	t_matrix2x2;
-typedef t_float16	t_matrix4x4;
+typedef float			t_float2 __attribute__((ext_vector_type(2)));
+typedef float			t_float4 __attribute__((ext_vector_type(4)));
+typedef float			t_float16 __attribute__((ext_vector_type(16)));
+typedef t_float4		t_matrix2x2;
+typedef t_float16		t_matrix4x4;
 /*  */
 
 /* overloadable vector operations */
@@ -42,4 +54,6 @@ t_float2	mul(t_matrix2x2 a, t_float2 b) __attribute__((overloadable));
 t_float4	mul(t_matrix4x4 a, t_float4 b) __attribute__((overloadable));
 t_matrix4x4	mul(t_matrix4x4 a, t_matrix4x4 b) __attribute__((overloadable));
 /*  */
+
+double		clamp(double v, double l, double r);
 #endif

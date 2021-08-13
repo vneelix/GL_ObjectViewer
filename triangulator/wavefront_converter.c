@@ -6,7 +6,7 @@
 /*   By: vneelix <vneelix@student.21-school.ru>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/08 20:29:01 by vneelix           #+#    #+#             */
-/*   Updated: 2021/08/09 19:55:28 by vneelix          ###   ########.fr       */
+/*   Updated: 2021/08/11 22:31:57 by vneelix          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,12 +27,12 @@ int	write_elements_into_vbo(void **data, int *index_array, float *vbo)
 				*(float *)(data[vn]), sizeof(t_float4),
 				index_array[1 + i + *index_array * 2] - 1);
 		if (ptr != NULL)
-			memcpy(&vbo[1 + (i + *index_array) * 4], ptr, sizeof(t_float4));
+			memcpy(&vbo[1 + *index_array * 4 + i * 4], ptr, sizeof(t_float4));
 		ptr = get_elem_from_array(data[vt] + sizeof(float),
-				*(float *)(data[vt]), sizeof(t_float2),
+				*(float *)(data[vt]), sizeof(float) * 3,
 				index_array[1 + i + *index_array] - 1);
 		if (ptr != NULL)
-			memcpy(&vbo[1 + (i + *index_array * 2) * 4], ptr, sizeof(t_float2));
+			memcpy(&vbo[1 + *index_array * 8 + i * 2], ptr, sizeof(t_float2));
 		i++;
 	}
 	return (0);
