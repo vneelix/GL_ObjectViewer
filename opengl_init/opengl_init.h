@@ -6,7 +6,7 @@
 /*   By: vneelix <vneelix@student.21-school.ru>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/09 23:07:33 by vneelix           #+#    #+#             */
-/*   Updated: 2021/08/13 00:33:29 by vneelix          ###   ########.fr       */
+/*   Updated: 2021/08/13 20:58:27 by vneelix          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,10 @@ typedef struct s_opengl
 	GLint	translation_matrix;
 
 	GLuint	texture;
+
+	GLuint	palette;
+	GLuint	framebuffer;
+	uint8_t	*palette_img;
 }	t_opengl;
 
 t_matrix4x4	rotation_manager(int8_t x, int8_t y);

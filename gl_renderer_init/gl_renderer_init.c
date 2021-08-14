@@ -6,7 +6,7 @@
 /*   By: vneelix <vneelix@student.21-school.ru>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/12 22:22:00 by vneelix           #+#    #+#             */
-/*   Updated: 2021/08/13 02:15:19 by vneelix          ###   ########.fr       */
+/*   Updated: 2021/08/14 13:40:47 by vneelix          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,10 +18,14 @@ int	gl_renderer_release(t_gl_renderer *gl_renderer, int err_code)
 		glDeleteProgram(gl_renderer->gl.program);
 	glDeleteBuffers(gl_renderer->obj_count, gl_renderer->vbo_array);
 	glDeleteVertexArrays(gl_renderer->obj_count, gl_renderer->vao_array);
+	glDeleteTextures(1, &gl_renderer->gl.program);
+	glDeleteTextures(1, &gl_renderer->gl.palette);
 	if (gl_renderer->model_data != NULL)
 		free(gl_renderer->model_data);
 	if (gl_renderer->object != NULL)
 		free(gl_renderer->object);
+	if (gl_renderer->gl.palette_img != NULL)
+		free(gl_renderer->gl.palette_img);
 	return (err_code);
 }
 
@@ -29,8 +33,36 @@ int	gl_flags_handling(void **data, uint32_t flags)
 {
 	if ((flags & (1 << 0)) == (1 << 0))
 		*(float *)(data[vn]) = 0;
-	if ((flags & (1 << 0)) == (1 << 0))
+	if ((flags & (1 << 1)) == (1 << 1))
 		*(float *)(data[vt]) = 0;
+	return (0);
+}
+
+int	gl_load_textures(t_gl_renderer *gl_renderer, char **err)
+{
+	glUseProgram(gl_renderer->gl.program);
+	if (gl_load_texture("resources/image.jpeg",
+			gl_renderer->gl.texture, NULL, err))
+	{
+		glUseProgram(0);
+		return (-1);
+	}
+	if (gl_load_texture("resources/palette.png",
+			gl_renderer->gl.palette, &gl_renderer->gl.palette_img, err))
+	{
+		glUseProgram(0);
+		return (-1);
+	}
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, gl_renderer->gl.framebuffer);
+	glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+		GL_TEXTURE_2D, gl_renderer->gl.palette, 0);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+	if (glGetError())
+	{
+		glUseProgram(0);
+		return (-1);
+	}
+	glUseProgram(0);
 	return (0);
 }
 
@@ -57,9 +89,7 @@ int	gl_renderer_init(t_gl_renderer *gl_renderer,
 	gl_renderer_calc_axis_offset(gl_renderer, data);
 	gl_uniforms_init(gl_renderer);
 	free(data);
-	glUseProgram(gl_renderer->gl.program);
-	if (gl_load_texture("image.jpeg", gl_renderer->gl.texture, err))
+	if (gl_load_textures(gl_renderer, err))
 		return (gl_renderer_release(gl_renderer, -1));
-	glUseProgram(0);
 	return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: vneelix <vneelix@student.21-school.ru>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/15 23:17:15 by vneelix           #+#    #+#             */
-/*   Updated: 2021/08/09 20:45:38 by vneelix          ###   ########.fr       */
+/*   Updated: 2021/08/14 13:22:07 by vneelix          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,16 +66,18 @@ int	def_writer(const char **obj, void *mem, unsigned int *def)
 	while (*obj)
 	{
 		if ((!strncmp(*obj, "v ", 2)
-				|| !strncmp(*obj, "v\t", 2)) && def_count[v]--)
+				|| !strncmp(*obj, "v\t", 2)) && def_count[v] && def_count[v]--)
 			simple_writer(*obj, ((void **)mem)[v] + sizeof(float), v);
 		else if ((!strncmp(*obj, "vn ", 3)
-				|| !strncmp(*obj, "vn\t", 3)) && def_count[vn]--)
+				|| !strncmp(*obj, "vn\t", 3))
+			&& def_count[vn] && def_count[vn]--)
 			simple_writer(*obj, ((void **)mem)[vn] + sizeof(float), vn);
 		else if ((!strncmp(*obj, "vt ", 3)
-				|| !strncmp(*obj, "vt\t", 3)) && def_count[vt]--)
+				|| !strncmp(*obj, "vt\t", 3))
+			&& def_count[vt] && def_count[vt]--)
 			simple_writer(*obj, ((void **)mem)[vt] + sizeof(float), vt);
 		else if ((!strncmp(*obj, "f ", 2)
-				|| !strncmp(*obj, "f\t", 2)) && def_count[f]--)
+				|| !strncmp(*obj, "f\t", 2)) && def_count[f] && def_count[f]--)
 			complex_writer(*obj, ((void **)mem)[f] + sizeof(int), def[f]);
 		obj++;
 	}

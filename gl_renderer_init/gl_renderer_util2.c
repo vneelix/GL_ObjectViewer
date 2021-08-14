@@ -6,7 +6,7 @@
 /*   By: vneelix <vneelix@student.21-school.ru>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/12 22:59:52 by vneelix           #+#    #+#             */
-/*   Updated: 2021/08/12 23:11:57 by vneelix          ###   ########.fr       */
+/*   Updated: 2021/08/13 20:48:40 by vneelix          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,12 +31,13 @@ uint8_t	*load_image(const char *image_path)
 	}
 	*(uint32_t *)img = ptr->w;
 	*((uint32_t *)img + 1) = ptr->h;
-	memcpy(img + 8, ptr->pixels, ptr->w * ptr->pitch * sizeof(uint8_t));
+	memcpy(img + 8, ptr->pixels, ptr->w * ptr->h * sizeof(uint32_t));
 	SDL_FreeSurface(ptr);
 	return (img);
 }
 
-int	gl_load_texture(const char *image_path, GLuint texture, char **err)
+int	gl_load_texture(const char *image_path,
+	GLuint texture, uint8_t **image, char **err)
 {
 	uint8_t	*img;
 
@@ -54,6 +55,9 @@ int	gl_load_texture(const char *image_path, GLuint texture, char **err)
 	}
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	free(img);
+	if (image != NULL)
+		*image = img;
+	else
+		free(img);
 	return (0);
 }

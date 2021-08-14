@@ -6,7 +6,7 @@
 /*   By: vneelix <vneelix@student.21-school.ru>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/07 20:42:44 by vneelix           #+#    #+#             */
-/*   Updated: 2021/08/09 19:55:01 by vneelix          ###   ########.fr       */
+/*   Updated: 2021/08/14 12:37:39 by vneelix          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,5 +58,6 @@ GLuint		*wavefront_to_gl_arrays_converter(
 
 int			error_callback(int err_code,
 				const char *target, const char *reason, char **err);
+long		in_range(long range, long index);
 
 #endif

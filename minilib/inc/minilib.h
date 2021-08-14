@@ -6,7 +6,7 @@
 /*   By: vneelix <vneelix@student.21-school.ru>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/08 19:56:31 by vneelix           #+#    #+#             */
-/*   Updated: 2021/08/09 20:16:08 by vneelix          ###   ########.fr       */
+/*   Updated: 2021/08/14 13:10:37 by vneelix          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,5 +33,8 @@ int			is_number(const char *str);
 void		*ft_memcpy(void *dest, const void *src, size_t n);
 int			error_callback(int err_code,
 				const char *target, const char *reason, char **err);
+char		*ft_itoa(int n);
+size_t		ft_strlen(const char *s);
+char		*ft_strdup(const char *s);
 
 #endif

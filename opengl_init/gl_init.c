@@ -6,7 +6,7 @@
 /*   By: vneelix <vneelix@student.21-school.ru>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/10 21:21:07 by vneelix           #+#    #+#             */
-/*   Updated: 2021/08/13 00:28:51 by vneelix          ###   ########.fr       */
+/*   Updated: 2021/08/13 21:04:48 by vneelix          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,5 +51,7 @@ int	gl_init(t_opengl *gl, const char *vertex_shader,
 		return (-1);
 	}
 	glGenTextures(1, &gl->texture);
+	glGenTextures(1, &gl->palette);
+	glGenFramebuffers(1, &gl->framebuffer);
 	return (0);
 }

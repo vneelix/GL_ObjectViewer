@@ -6,7 +6,7 @@
 /*   By: vneelix <vneelix@student.21-school.ru>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/10 21:51:16 by vneelix           #+#    #+#             */
-/*   Updated: 2021/08/13 00:29:03 by vneelix          ###   ########.fr       */
+/*   Updated: 2021/08/14 12:19:02 by vneelix          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,11 +61,15 @@ int	gl_renderer_calc_axis_offset(t_gl_renderer *gl_renderer, void **data)
 		-4 - (axis_border[4].z - axis_border[5].z),
 		0
 	};
+	gl_renderer->k = ((axis_border[0].x - axis_border[1].x)
+			+ (axis_border[2].y - axis_border[3].y)
+			+ (axis_border[4].z - axis_border[5].z)) / 3.;
+	memcpy(&gl_renderer->axis_offset_backup,
+		&gl_renderer->axis_offset, sizeof(t_float4));
 	center = (t_float4){
 		axis_border[1].x + (axis_border[0].x - axis_border[1].x) / 2,
 		axis_border[3].y + (axis_border[2].y - axis_border[3].y) / 2,
-		axis_border[5].z + (axis_border[4].z - axis_border[5].z) / 2,
-		1
+		axis_border[5].z + (axis_border[4].z - axis_border[5].z) / 2, 1
 	};
 	glUseProgram(gl_renderer->gl.program);
 	glUniform4fv(gl_renderer->gl.center, 1, (const GLfloat *)&center);
@@ -81,7 +85,7 @@ int	gl_uniforms_init(t_gl_renderer *gl_renderer)
 		gl_renderer->axis_offset.z, gl_renderer->gl.translation_matrix);
 	perspective_projection_matrix(gl_renderer->fov,
 		(double)gl_renderer->canvas.x / gl_renderer->canvas.y,
-		(t_float2){0.128, 512}, gl_renderer->gl.projection_matrix);
+		(t_float2){0.128, 1024}, gl_renderer->gl.projection_matrix);
 	color_init((t_float4){1, 1, 1, 1}, gl_renderer->gl.color);
 	glUniform1f(gl_renderer->gl.mode, 0);
 	glUseProgram(0);

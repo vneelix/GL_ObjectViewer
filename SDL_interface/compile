@@ -1,1 +1,0 @@
-clang -g -O0 -fsanitize=address -Wall -Wextra *.c -lSDL2 -lSDL2_image -lSDL2_ttf -I/usr/include/SDL2/ -o program
